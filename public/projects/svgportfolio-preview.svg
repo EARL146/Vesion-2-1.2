@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title description">
+  <title id="title">Portfolio Version 1.0 preview</title>
+  <desc id="description">A vector illustration representing an interactive portfolio made with SVG, HTML, CSS, and JavaScript.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071d35"/><stop offset="1" stop-color="#102f4b"/></linearGradient>
+    <linearGradient id="orb" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#47dfc0"/><stop offset="1" stop-color="#47a6ed"/></linearGradient>
+    <linearGradient id="type" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#8ef0ce"/><stop offset="1" stop-color="#7ac5ff"/></linearGradient>
+  </defs>
+  <rect width="1200" height="760" rx="32" fill="url(#bg)"/>
+  <path d="M0 525C186 458 279 612 458 548s242-237 435-179 199 174 307 111v280H0z" fill="#0b2743" opacity=".9"/>
+  <g fill="none" stroke="#55d8c2" opacity=".42">
+    <path d="M-70 244c145-122 268-122 413 0s268 122 413 0 268-122 413 0" stroke-width="2"/>
+    <path d="M-70 270c145-122 268-122 413 0s268 122 413 0 268-122 413 0" stroke-width="2"/>
+    <path d="M-70 296c145-122 268-122 413 0s268 122 413 0 268-122 413 0" stroke-width="2"/>
+  </g>
+  <rect x="72" y="66" width="1056" height="628" rx="24" fill="#0d2540" stroke="#31516d" stroke-width="2"/>
+  <circle cx="105" cy="99" r="7" fill="#ff7d76"/><circle cx="129" cy="99" r="7" fill="#ffc56b"/><circle cx="153" cy="99" r="7" fill="#54d9ae"/>
+  <text x="194" y="106" fill="#b9cddd" font-family="Arial,sans-serif" font-size="15">EARL · PORTFOLIO</text>
+  <path d="M860 99h42m32 0h42m32 0h42" stroke="#7e9cb5" stroke-width="3" stroke-linecap="round"/>
+  <text x="136" y="191" fill="#7fe1c7" font-family="Arial,sans-serif" font-size="17" font-weight="700" letter-spacing="4">VERSION 01 · INTERACTIVE SVG</text>
+  <text x="130" y="291" fill="#f4f8fb" font-family="Arial,sans-serif" font-size="75" font-weight="700">Creative</text>
+  <text x="130" y="378" fill="url(#type)" font-family="Arial,sans-serif" font-size="75" font-weight="700">Web Portfolio</text>
+  <text x="136" y="428" fill="#b6c9d8" font-family="Arial,sans-serif" font-size="20">An early portfolio built around custom vector motion</text>
+  <text x="136" y="459" fill="#b6c9d8" font-family="Arial,sans-serif" font-size="20">and a hand-crafted, responsive web experience.</text>
+  <rect x="136" y="503" width="190" height="53" rx="26" fill="url(#orb)"/>
+  <text x="178" y="537" fill="#08243c" font-family="Arial,sans-serif" font-size="16" font-weight="700">EXPLORE WORK</text>
+  <g transform="translate(833 298)">
+    <circle cx="108" cy="108" r="106" fill="#0b2743" stroke="#4bd5bf" stroke-width="2"/>
+    <path d="M34 106c0-42 33-76 74-76s74 34 74 76-33 76-74 76-74-34-74-76z" fill="none" stroke="#79c5ff" stroke-width="2" stroke-dasharray="8 10"/>
+    <path d="M108 31 178 73v75l-70 39-70-39V73z" fill="url(#orb)" opacity=".95"/>
+    <path d="m108 31 70 42-70 40-70-40z" fill="#b8fff0" opacity=".7"/>
+    <path d="M108 113v74l70-39V73z" fill="#4389d2" opacity=".72"/>
+    <circle cx="108" cy="108" r="14" fill="#fff"/>
+    <circle cx="34" cy="106" r="7" fill="#ffb86a"/><circle cx="182" cy="91" r="7" fill="#ff7d76"/><circle cx="141" cy="22" r="7" fill="#e0a3ff"/>
+  </g>
+  <rect x="823" y="550" width="238" height="45" rx="22" fill="#163955" stroke="#315b79"/>
+  <circle cx="849" cy="572" r="6" fill="#55ddbc"/>
+  <text x="866" y="578" fill="#d2e2ec" font-family="Arial,sans-serif" font-size="14">HTML · CSS · JavaScript · SVG</text>
+  <text x="136" y="651" fill="#728da5" font-family="Arial,sans-serif" font-size="13" letter-spacing="2">A FIRST EDITION, BUILT WITH MOTION AND DETAIL</text>
+</svg>

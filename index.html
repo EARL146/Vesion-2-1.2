@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    
+    <!-- Primary SEO -->
+    <title>Earlnis Willan Agang Pajo | Full-Stack Web Developer & Software Engineer</title>
+    <meta name="description" content="Earlnis Willan Agang Pajo — BSIT student and Full-Stack Web Developer based in Compostela, Davao de Oro, Philippines. Working with Java 21, Spring Boot, Node.js, Express, MySQL, PHP, and Flutter." />
+    <link rel="canonical" href="https://earlnis.dev/" />
+    <meta name="author" content="Earlnis Willan Agang Pajo" />
+    <meta name="keywords" content="Earlnis Willan Pajo, Earl Pajo, Full Stack Developer, Web Developer Philippines, BSIT, React, Node.js, Spring Boot, MySQL, Java 21, Flutter" />
+    <meta name="theme-color" content="#0A0D14" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Earlnis Willan Agang Pajo | Full-Stack Web Developer — Portfolio v2" />
+    <meta property="og:url" content="https://earlnis.dev/" />
+    <meta property="og:description" content="Thoughtful development, one project at a time. Explore full-stack apps, REST APIs, and modern systems." />
+    <meta property="og:image" content="./avatar.jpg" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="./favicon.png?v=2" />
+    <link rel="shortcut icon" href="./favicon.ico?v=2" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2" />
+
+    <!-- Google Fonts: Poppins & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Anti-FOUC Theme Initializer -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('earl-theme');
+          var theme = saved ? saved : 'dark';
+          document.documentElement.dataset.theme = theme;
+          var bar = document.querySelector('meta[name="theme-color"]');
+          if (bar) {
+            bar.setAttribute('content', theme === 'dark' ? '#070B14' : '#F4F4ED');
+          }
+        } catch(e) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./src/main.jsx"></script>
+  </body>
+</html>

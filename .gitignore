@@ -1,0 +1,6 @@
+# Keep local credentials out of GitHub; commit only the placeholder template.
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
