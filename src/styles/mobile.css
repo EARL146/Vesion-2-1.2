@@ -21,11 +21,19 @@
 .pbar,
 .mdrawer,
 .mhome,
-.pfilter {
+.pfilter,
+.only-mobile {
   display: none;
 }
 
 @media (max-width: 1099px) {
+  .only-desktop {
+    display: none !important;
+  }
+
+  .only-mobile {
+    display: inline !important;
+  }
   /* ---------- Compact sticky top bar ---------- */
   .pbar {
     position: sticky;
@@ -569,25 +577,31 @@
 
   /* ---------- Inner pages: flat, unwrapped layout ---------- */
   .page-view {
-    gap: 22px;
-    padding: 22px 20px 96px;
+    gap: 20px;
+    padding: 20px 18px 96px;
   }
 
   .view__head {
     gap: 8px;
   }
 
+  .view__head--split {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
   .view__eyebrow {
-    font-size: 12.5px;
+    font-size: 12px;
   }
 
   .view__title {
-    font-size: clamp(30px, 8.4vw, 36px);
+    font-size: clamp(28px, 8vw, 36px);
     line-height: 1.12;
   }
 
   .view__lede {
-    font-size: 16.5px;
+    font-size: 15.5px;
     line-height: 1.5;
   }
 
@@ -602,7 +616,7 @@
     display: none;
   }
 
-  /* Projects: segmented filter */
+  /* ---------- Projects Page (Dedicated Phone & Tablet Layout) ---------- */
   .pfilter {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -615,7 +629,7 @@
   .pfilter__chip {
     height: 38px;
     border-radius: 999px;
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 600;
     color: var(--muted);
     transition: background var(--dur-fast), color var(--dur-fast), box-shadow var(--dur-fast);
@@ -636,9 +650,44 @@
 
   .pcard-stack {
     grid-template-rows: none;
+    gap: 10px;
   }
 
-  /* Services */
+  .pcard-mini {
+    padding: 12px 14px;
+  }
+
+  @media (min-width: 681px) and (max-width: 1099px) {
+    .pgrid-bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pcard--wide,
+    .pcard-stack,
+    .pcard--deck {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .pcard--wide {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    /* Keep the 2 project browser windows side-by-side on phone like BrewedOps */
+    .pcard__windows {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .pcard__windows .bento-win img {
+      height: 104px;
+    }
+  }
+
+  /* ---------- Services Page (Dedicated Phone Workflow Board) ---------- */
   .sgrid__method {
     padding: 0;
     background: none;
@@ -646,10 +695,321 @@
   }
 
   .sgrid__stage {
-    background: rgba(var(--ink-rgb), 0.05);
+    background: var(--paper);
+    box-shadow: inset 0 0 0 1px var(--line);
   }
 
-  /* About: illustration leads the copy */
+  @media (max-width: 720px) {
+    .sgrid__services {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .sgrid__flow-head {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .sgrid__flow-tools {
+      justify-content: flex-start;
+    }
+
+    .wf-canvas {
+      padding: 16px 12px 14px;
+      gap: 12px;
+    }
+
+    .wf-row--top,
+    .wf-row--bottom {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      max-width: 100%;
+    }
+
+    .wf-node {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      column-gap: 9px;
+      row-gap: 1px;
+      align-items: center;
+      text-align: left;
+      padding: 9px 10px;
+      border-radius: 14px;
+      background: var(--paper);
+      box-shadow: inset 0 0 0 1px var(--line);
+    }
+
+    .wf-node.is-selected,
+    .wf-node--active {
+      background: rgba(var(--accent-rgb), 0.08);
+      box-shadow: inset 0 0 0 1.5px var(--accent);
+    }
+
+    .wf-node__tile {
+      grid-row: 1 / span 2;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+    }
+
+    .wf-node__title {
+      font-size: 12px;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wf-node__sub {
+      font-size: 10.5px;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wf-caption {
+      text-align: left;
+      padding: 11px 13px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+  }
+
+  /* ---------- Dev Lab Page (Dedicated Mobile Workspace App) ---------- */
+  .lab-gh-badge {
+    width: 100%;
+  }
+
+  .lab-gh-badge__card {
+    width: 100%;
+  }
+
+  .lab-gh-badge__card > svg:last-child {
+    margin-left: auto;
+  }
+
+  @media (max-width: 820px) {
+    .lab-head .home__cta {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .lab-window {
+      max-width: 100%;
+    }
+
+    .lab-app {
+      min-height: 0;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .lab-app__side,
+    .lab-app__main,
+    .lab-pane {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .lab-app__side {
+      padding: 12px 14px;
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+      gap: 10px;
+    }
+
+    .lab-app__clocks,
+    .lab-app__note {
+      display: none;
+    }
+
+    .lab-app__nav {
+      flex-direction: row;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+
+    .lab-app__nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .lab-app__tab {
+      flex: 0 0 auto;
+      white-space: nowrap;
+      padding: 8px 13px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      background: var(--white);
+      box-shadow: inset 0 0 0 1px var(--line);
+    }
+
+    .lab-app__tab.is-active {
+      background: var(--navy);
+      color: var(--cream);
+      box-shadow: none;
+    }
+
+    .lab-app__topbar {
+      padding: 10px 14px;
+      gap: 8px;
+    }
+
+    .lab-app__topbar strong {
+      font-size: 13px;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lab-status-pill,
+    .lab-pro-pill {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .lab-pane {
+      padding: 16px 14px;
+      gap: 14px;
+    }
+
+    .lab-cylinder {
+      min-height: 340px;
+    }
+
+    .cylinder-stage {
+      height: 235px;
+    }
+
+    .cylinder-ring {
+      width: 210px;
+      height: 188px;
+    }
+
+    .cylinder-card {
+      transform:
+        translateX(calc(var(--slot) * 114px))
+        translateZ(calc(var(--slot) * var(--slot) * -45px))
+        rotateY(calc(var(--slot) * -18deg))
+        scale(calc(1 - (var(--slot) * var(--slot) * 0.07)));
+    }
+
+    .cylinder-controls {
+      width: 100%;
+      gap: 8px;
+    }
+
+    .cylinder-info {
+      min-width: 140px;
+      flex: 1 1 140px;
+    }
+
+    .cylinder-controls .btn-pill {
+      width: 100%;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    .lab-iframe-wrap,
+    .lab-iframe {
+      min-height: 360px;
+      height: 360px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .lab-status-pill {
+      display: none;
+    }
+  }
+
+  /* ---------- Certificates Page (Swipeable Mobile Picker & Clean Ledger) ---------- */
+  .cfilter {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    width: 100%;
+    gap: 2px;
+    padding: 4px;
+  }
+
+  .cfilter__chip {
+    padding: 0 4px;
+    font-size: 11.5px;
+    white-space: nowrap;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tgrid__shell,
+  .tgrid__reel,
+  .tgrid__ledger,
+  .tgrid__card {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .tgrid__stage {
+    min-height: 236px;
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .tgrid__img {
+    max-height: 196px;
+    max-width: 100%;
+  }
+
+  .tgrid__play {
+    width: 48px;
+    height: 48px;
+  }
+
+  .tgrid__picker {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 8px;
+    padding: 2px 2px 6px;
+    scrollbar-width: none;
+  }
+
+  .tgrid__picker::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tgrid__pick {
+    flex: 0 0 auto;
+    width: 196px;
+    scroll-snap-align: start;
+    padding: 8px 10px;
+  }
+
+  .tgrid__pick-copy strong {
+    font-size: 11.5px;
+  }
+
+  @media (max-width: 680px) {
+    .tgrid__ghost {
+      display: none;
+    }
+
+    .tgrid__row {
+      padding: 14px;
+      gap: 12px;
+    }
+
+    .tgrid__edu {
+      padding: 14px;
+      align-items: flex-start;
+    }
+  }
+
+  /* ---------- About Page: Illustration leads the copy ---------- */
   .agrid__shell {
     display: flex;
     flex-direction: column;
@@ -660,19 +1020,137 @@
     order: -1;
     align-self: center;
     justify-self: center;
-    max-width: 300px;
+    max-width: 270px;
     margin: 0 auto;
   }
 
-  /* Contact: form first, FAQ card second */
-  .cgrid__panel {
-    order: -1;
+  @media (max-width: 560px) {
+    .agrid__cap {
+      grid-template-columns: 88px minmax(0, 1fr) auto;
+      gap: 10px;
+    }
   }
 
-  /* Floating utilities */
+  /* ---------- Contact Page: Form first, FAQ card second ---------- */
+  .cgrid__panel {
+    order: -1;
+    padding: 18px;
+  }
+
+  .cgrid__aside {
+    padding: 20px 18px;
+  }
+
+  @media (max-width: 640px) {
+    .cgrid__actions {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    .cgrid__submit {
+      width: 100%;
+      justify-content: center;
+      height: 50px;
+    }
+
+    .cgrid__hint {
+      text-align: center;
+    }
+
+    .cgrid__mail {
+      width: 100%;
+      justify-content: center;
+      height: 40px;
+    }
+
+    .cgrid__socials {
+      justify-content: center;
+    }
+  }
+
+  /* ---------- Modals: Native Phone Bottom Sheet ---------- */
+  @media (max-width: 680px) {
+    .pmodal {
+      align-items: flex-end;
+      padding: 0;
+    }
+
+    .ppanel--window {
+      width: 100%;
+      max-height: 92dvh;
+      border-radius: 22px 22px 0 0;
+    }
+
+    .ppanel__bar {
+      padding: 10px 12px;
+      gap: 8px;
+    }
+
+    .pmodal .ppanel__dots {
+      display: none;
+    }
+
+    .ppanel__scroll {
+      padding: 16px 14px 24px;
+    }
+
+    .pdetail {
+      gap: 16px;
+    }
+
+    .pdetail__actions .btn-pill {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+
+    .cmodal__devices {
+      display: none;
+    }
+
+    .cmodal__stage {
+      gap: 6px;
+    }
+
+    .cmodal__nav {
+      width: 32px;
+      height: 32px;
+    }
+
+    .cmodal__frame,
+    .cmodal__frame--desktop,
+    .cmodal__frame--tablet,
+    .cmodal__frame--phone {
+      max-width: 100%;
+      width: 100%;
+      padding: 10px;
+      border-radius: 14px;
+    }
+
+    .cmodal__frame img {
+      max-height: 250px;
+      width: 100%;
+      object-fit: contain;
+    }
+
+    .cmodal__meta {
+      padding: 14px;
+    }
+  }
+
+  /* ---------- Floating utilities ---------- */
   .kchat {
     right: 14px;
-    bottom: calc(18px + env(safe-area-inset-bottom));
+    bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .kchat__bubble {
+    display: none !important;
+  }
+
+  .kchat__avatar-btn {
+    width: 48px;
+    height: 48px;
   }
 
   .a11y {

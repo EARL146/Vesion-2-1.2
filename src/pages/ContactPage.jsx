@@ -136,7 +136,8 @@ export default function ContactPage({ onOpenResume }) {
             <span className="cgrid__eyebrow">FAQS</span>
             <h3 className="cgrid__aside-title">
               <strong>Quick answers.</strong>
-              <span>Still have one? Write on the right.</span>
+              <span className="only-desktop">Still have one? Write on the right.</span>
+              <span className="only-mobile">Still have one? Use the form above.</span>
             </h3>
           </div>
 

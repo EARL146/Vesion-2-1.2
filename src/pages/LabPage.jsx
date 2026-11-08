@@ -185,7 +185,7 @@ export default function LabPage({ onOpenProject }) {
                     <span className="lab-status-box__label">TODAY</span>
                     <p>
                       <CheckCircle2 size={15} />
-                      <span>All 7 repositories documented, 6 credentials verified, static build ready for GitHub Pages.</span>
+                      <span>All 7 repositories documented, 12 credentials verified, static build ready for GitHub Pages.</span>
                     </p>
                   </div>
 

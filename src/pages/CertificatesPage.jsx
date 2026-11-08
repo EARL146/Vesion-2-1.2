@@ -98,7 +98,12 @@ export default function CertificatesPage({ onOpenCertificate }) {
           <div className="tgrid__ledger-head">
             <h3 className="tgrid__ledger-title">Twelve credentials. Real coursework behind them.</h3>
             <p className="tgrid__ledger-sub">
-              Click any row to preview on the left, or open it in the full-resolution viewer.
+              <span className="only-desktop">
+                Click any row to preview on the left, or open it in the full-resolution viewer.
+              </span>
+              <span className="only-mobile">
+                Tap any credential below to preview above, or open it in the full-resolution viewer.
+              </span>
             </p>
           </div>
 
