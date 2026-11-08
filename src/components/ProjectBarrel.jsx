@@ -84,14 +84,14 @@ const BARREL_ITEMS = [
   },
   {
     id: 'certificates',
-    title: '6 Official Technical Certifications',
+    title: '12 Official Technical Certifications',
     category: 'Accreditation',
-    badge: 'TESDA · OPSWAT · PyCon · Full Stack',
-    desc: 'Six certificate records covering visual design, cybersecurity, Python community participation, full-stack learning, and a GoHighLevel workshop.',
+    badge: 'DataCamp · TESDA · OPSWAT · PyCon · Full Stack',
+    desc: 'Twelve verified certificate records covering DataCamp (SQL, Python, Git & GitHub), Full Stack + AI, TESDA visual design, OPSWAT cybersecurity, PyCon Davao, and GoHighLevel.',
     image: './certificates/cert_05_fullstack_ai.png',
     github: null,
     demo: '#credentials',
-    tags: ['TESDA', 'OPSWAT', 'PyCon', 'Full Stack']
+    tags: ['DataCamp', 'TESDA', 'OPSWAT', 'PyCon', 'Full Stack']
   }
 ];
 

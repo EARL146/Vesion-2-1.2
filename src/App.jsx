@@ -1,24 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter, Link } from './lib/router';
 import HeroCanvas from './components/HeroCanvas';
 import LeftRail from './components/LeftRail';
-import BentoGrid from './components/BentoGrid';
-import ProjectBarrel from './components/ProjectBarrel';
-import ProjectsSection from './components/ProjectsSection';
-import ServicesSection from './components/ServicesSection';
-import SkillsSection from './components/SkillsSection';
-import CredentialsSection from './components/CredentialsSection';
-import ContactSection from './components/ContactSection';
-import Footer from './components/Footer';
+import AccessibilityMenu from './components/AccessibilityMenu';
 import ChatBuddy from './components/ChatBuddy';
+import ProjectModal from './components/ProjectModal';
+import CertificateModal from './components/CertificateModal';
 import ResumeModal from './components/ResumeModal';
+
+import HomePage from './pages/HomePage';
+import ProjectsPage from './pages/ProjectsPage';
+import ServicesPage from './pages/ServicesPage';
+import LabPage from './pages/LabPage';
+import CertificatesPage from './pages/CertificatesPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
 
 const VIEW_COUNTER_API = 'https://page-views-api.ratneshc.com/api/v1';
 const VIEW_COUNTER_SITE = 'earlnis.dev';
 const VIEW_COUNTER_PATH = '/';
 
 export default function App() {
-  const [activeSection, setActiveSection] = useState('overview');
+  const { path } = useRouter();
   const [visitorCount, setVisitorCount] = useState(null);
+  const [activeProjectId, setActiveProjectId] = useState(null);
+  const [activeCertIndex, setActiveCertIndex] = useState(null);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
 
   useEffect(() => {
@@ -28,98 +34,122 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const host = window.location.hostname.toLowerCase();
-    if (import.meta.env.DEV || host === 'localhost' || host === '127.0.0.1' || host === '::1') return undefined;
-
     let active = true;
+    const host = window.location.hostname.toLowerCase();
+    const isLocal =
+      import.meta.env.DEV || host === 'localhost' || host === '127.0.0.1' || host === '::1';
+
     const params = new URLSearchParams({ site: VIEW_COUNTER_SITE, path: VIEW_COUNTER_PATH });
     const query = params.toString();
 
     const readGlobalViews = async () => {
       try {
-        const response = await fetch(`${VIEW_COUNTER_API}/views?${query}`, { cache: 'no-store' });
-        if (!response.ok) return;
-        const data = await response.json();
+        const res = await fetch(`${VIEW_COUNTER_API}/views?${query}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
         const views = Number(data.views);
-        if (active && Number.isSafeInteger(views) && views >= 0) setVisitorCount(views);
+        if (active && Number.isSafeInteger(views) && views >= 0) {
+          setVisitorCount(views);
+        }
       } catch {
-        // Keep the count unavailable if the shared counter cannot be reached.
+        // Keep fallback label when offline.
       }
     };
 
-    const trackPageView = async () => {
-      try {
-        await fetch(`${VIEW_COUNTER_API}/track?${query}`, { cache: 'no-store', keepalive: true });
-      } catch {
-        // Still try to read the shared total if only the tracking request failed.
+    const run = async () => {
+      if (!isLocal) {
+        try {
+          await fetch(`${VIEW_COUNTER_API}/track?${query}`, { cache: 'no-store', keepalive: true });
+        } catch {
+          // Ignore tracking error and still read total.
+        }
       }
       await readGlobalViews();
     };
 
-    trackPageView();
-    const refreshTimer = window.setInterval(readGlobalViews, 60_000);
-
+    run();
+    const timer = window.setInterval(readGlobalViews, 60000);
     return () => {
       active = false;
-      window.clearInterval(refreshTimer);
+      window.clearInterval(timer);
     };
   }, []);
 
-  // Track active section for sidebar highlighting
-  useEffect(() => {
-    const sectionIds = ['overview', 'versions', 'barrel', 'projects', 'services', 'skills', 'credentials', 'contact'];
-    
-    const handleScroll = () => {
-      const activeLine = Math.min(window.innerHeight * 0.32, 240);
-      let current = 'overview';
-      for (const id of sectionIds) {
-        const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= activeLine) current = id;
-      }
-      setActiveSection(current);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll);
-    handleScroll();
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
-    };
-  }, []);
+  const renderPage = () => {
+    switch (path) {
+      case '/':
+        return (
+          <HomePage
+            onOpenResume={() => setIsResumeOpen(true)}
+            onOpenProject={(id) => setActiveProjectId(id)}
+          />
+        );
+      case '/projects':
+        return <ProjectsPage onOpenProject={(id) => setActiveProjectId(id)} />;
+      case '/services':
+        return <ServicesPage />;
+      case '/lab':
+        return <LabPage onOpenProject={(id) => setActiveProjectId(id)} />;
+      case '/certificates':
+        return <CertificatesPage onOpenCertificate={(idx) => setActiveCertIndex(idx)} />;
+      case '/about':
+        return <AboutPage />;
+      case '/contact':
+        return <ContactPage onOpenResume={() => setIsResumeOpen(true)} />;
+      default:
+        return (
+          <section className="page-view page-notfound">
+            <div className="sweep-glass notfound-box">
+              <span className="view__eyebrow">404</span>
+              <h2 className="view__title">Page not found.</h2>
+              <p className="view__lede">That route doesn&apos;t exist on this portfolio.</p>
+              <Link to="/" className="home__cta">
+                <span>Back to Home</span>
+              </Link>
+            </div>
+          </section>
+        );
+    }
+  };
 
   return (
-    <div className="app-container">
-      {/* Three.js Generative Noise Background */}
+    <div className="shell">
       <HeroCanvas />
 
-      {/* Desktop Sticky Rail / Mobile Navigation */}
-      <a className="skip-link" href="#main-content">Skip to content</a>
-      <LeftRail 
-        activeSection={activeSection} 
-        visitorCount={visitorCount} 
+      <a className="skip-link" href="#shell-panel">
+        Skip to main content
+      </a>
+
+      <LeftRail
+        visitorCount={visitorCount}
         onOpenResume={() => setIsResumeOpen(true)}
       />
 
-      {/* Main Content Area */}
-      <main className="main-content" id="main-content" tabIndex="-1">
-        <BentoGrid />
-        <ProjectBarrel />
-        <ProjectsSection />
-        <ServicesSection />
-        <SkillsSection />
-        <CredentialsSection />
-        <ContactSection />
-        <Footer />
+      <main id="shell-panel" className="shell__panel" tabIndex={-1}>
+        <div key={path} className="shell__route">
+          {renderPage()}
+        </div>
       </main>
 
-      {/* Floating Interactive EarlBot Mascot */}
-      <ChatBuddy />
+      <AccessibilityMenu />
 
-      {/* Official Executive Resume Modal */}
-      <ResumeModal 
-        isOpen={isResumeOpen} 
-        onClose={() => setIsResumeOpen(false)} 
+      <ChatBuddy onOpenResume={() => setIsResumeOpen(true)} />
+
+      <ProjectModal
+        projectId={activeProjectId}
+        onSelectProject={(id) => setActiveProjectId(id)}
+        onClose={() => setActiveProjectId(null)}
+      />
+
+      <CertificateModal
+        certIndex={activeCertIndex}
+        onSelectIndex={(idx) => setActiveCertIndex(idx)}
+        onClose={() => setActiveCertIndex(null)}
+      />
+
+      <ResumeModal
+        isOpen={isResumeOpen}
+        onClose={() => setIsResumeOpen(false)}
       />
     </div>
   );

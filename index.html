@@ -3,21 +3,55 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    
+
     <!-- Primary SEO -->
-    <title>Earlnis Willan Agang Pajo | Full-Stack Web Developer & Software Engineer</title>
-    <meta name="description" content="Earlnis Willan Agang Pajo — BSIT student and Full-Stack Web Developer based in Compostela, Davao de Oro, Philippines. Working with Java 21, Spring Boot, Node.js, Express, MySQL, PHP, and Flutter." />
+    <title>Earl Willan Pajo — Full-Stack Web Developer &amp; Software Engineer</title>
+    <meta
+      name="description"
+      content="Earlnis Willan Agang Pajo — BSIT student and Full-Stack Web Developer based in Compostela, Davao de Oro, Philippines. Building web apps, REST APIs, and mobile apps with Java 21, Spring Boot, Node.js, Express, MySQL, PHP, and Flutter."
+    />
     <link rel="canonical" href="https://earlnis.dev/" />
     <meta name="author" content="Earlnis Willan Agang Pajo" />
-    <meta name="keywords" content="Earlnis Willan Pajo, Earl Pajo, Full Stack Developer, Web Developer Philippines, BSIT, React, Node.js, Spring Boot, MySQL, Java 21, Flutter" />
-    <meta name="theme-color" content="#0A0D14" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta
+      name="keywords"
+      content="Earlnis Willan Pajo, Earl Willan Pajo, Earl Pajo, Full Stack Developer, Web Developer Philippines, BSIT, React, Node.js, Spring Boot, MySQL, Java 21, Flutter"
+    />
+    <meta name="theme-color" content="#F4F4ED" />
+
+    <!-- Security -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- Preload critical desktop rail illustration -->
+    <link
+      rel="preload"
+      as="image"
+      href="./illustrations/rail-avatar.webp"
+      fetchpriority="high"
+      media="(min-width: 1100px)"
+    />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Earlnis Willan Agang Pajo | Full-Stack Web Developer — Portfolio v2" />
+    <meta property="og:site_name" content="Earl Willan Pajo — Portfolio" />
+    <meta property="og:title" content="Earl Willan Pajo — Full-Stack Web Developer &amp; Software Engineer" />
     <meta property="og:url" content="https://earlnis.dev/" />
-    <meta property="og:description" content="Thoughtful development, one project at a time. Explore full-stack apps, REST APIs, and modern systems." />
+    <meta
+      property="og:description"
+      content="Thoughtful code. Built to last. Explore full-stack web apps, Java Spring Boot &amp; Node.js APIs, MySQL databases, and Flutter builds."
+    />
     <meta property="og:image" content="./avatar.jpg" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Earl Willan Pajo — Full-Stack Web Developer" />
+    <meta
+      name="twitter:description"
+      content="BSIT student &amp; Full-Stack Developer building with Java 21, Spring Boot, Node.js, MySQL, and Flutter."
+    />
+    <meta name="twitter:image" content="./avatar.jpg" />
 
     <!-- Icons -->
     <link rel="icon" type="image/png" href="./favicon.png?v=2" />
@@ -27,21 +61,70 @@
     <!-- Google Fonts: Poppins & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-    <!-- Anti-FOUC Theme Initializer -->
-    <script>
-      (function() {
-        try {
-          var saved = localStorage.getItem('earl-theme');
-          var theme = saved ? saved : 'dark';
-          document.documentElement.dataset.theme = theme;
-          var bar = document.querySelector('meta[name="theme-color"]');
-          if (bar) {
-            bar.setAttribute('content', theme === 'dark' ? '#070B14' : '#F4F4ED');
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://earlnis.dev/#earl",
+            "name": "Earlnis Willan Agang Pajo",
+            "alternateName": "Earl Willan Pajo",
+            "url": "https://earlnis.dev/",
+            "jobTitle": "Full-Stack Web Developer",
+            "email": "mailto:earlypajo@gmail.com",
+            "alumniOf": {
+              "@type": "CollegeOrUniversity",
+              "name": "Legacy Compostela College"
+            },
+            "knowsAbout": [
+              "Java 21",
+              "Spring Boot",
+              "Node.js",
+              "Express.js",
+              "MySQL",
+              "PHP",
+              "Flutter",
+              "Dart",
+              "React",
+              "Full-Stack Web Development"
+            ],
+            "sameAs": [
+              "https://github.com/EARL146",
+              "https://www.linkedin.com/in/earlnis-pajo-272840432",
+              "https://earl146.github.io/svgportfolio"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://earlnis.dev/#website",
+            "url": "https://earlnis.dev/",
+            "name": "Earl Willan Pajo — Portfolio",
+            "publisher": { "@id": "https://earlnis.dev/#earl" },
+            "inLanguage": "en-US"
           }
-        } catch(e) {
-          document.documentElement.dataset.theme = 'dark';
+        ]
+      }
+    </script>
+
+    <!-- Theme before first paint: default light (#F4F4ED), dark opt-in persisted -->
+    <script>
+      (function () {
+        try {
+          document.documentElement.dataset.theme =
+            localStorage.getItem('earl-theme') === 'dark' ? 'dark' : 'light';
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+        if (document.documentElement.dataset.theme === 'dark') {
+          var bar = document.querySelector('meta[name="theme-color"]');
+          if (bar) bar.setAttribute('content', '#070B14');
         }
       })();
     </script>

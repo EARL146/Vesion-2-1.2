@@ -161,7 +161,7 @@ export default function ResumeModal({ isOpen, onClose }) {
               </p>
               <ul className="resume-bullet-list">
                 <li>Designed and deployed 7+ complete software systems (e-commerce, POS inventory, client booking, and mobile apps).</li>
-                <li>Earned 6 accredited credentials spanning Full-Stack Web Development + AI, Cybersecurity Infrastructure, Visual Design, and Web APIs.</li>
+                <li>Earned 12 accredited credentials spanning DataCamp (SQL, Python, Git &amp; GitHub), Full-Stack Web Development + AI, Cybersecurity Infrastructure, and Visual Design.</li>
               </ul>
             </div>
 
@@ -296,6 +296,48 @@ export default function ResumeModal({ isOpen, onClose }) {
 
             <div className="resume-certs-grid">
               <div className="resume-cert-box">
+                <span className="cert-inst">DataCamp</span>
+                <h4 className="cert-name">Introduction to SQL</h4>
+                <span className="cert-meta">Completed Nov 2026 · ID: #50,681,251 (2 hrs)</span>
+              </div>
+
+              <div className="resume-cert-box">
+                <span className="cert-inst">DataCamp</span>
+                <h4 className="cert-name">Intermediate GitHub Concepts</h4>
+                <span className="cert-meta">Completed Nov 2026 · ID: #50,676,876 (3 hrs)</span>
+              </div>
+
+              <div className="resume-cert-box">
+                <span className="cert-inst">DataCamp</span>
+                <h4 className="cert-name">Introduction to GitHub Concepts</h4>
+                <span className="cert-meta">Completed Oct 2026 · ID: #50,675,858 (2 hrs)</span>
+              </div>
+
+              <div className="resume-cert-box">
+                <span className="cert-inst">DataCamp</span>
+                <h4 className="cert-name">Introduction to Python for Developers</h4>
+                <span className="cert-meta">Completed Oct 2026 · ID: #50,673,623 (3 hrs)</span>
+              </div>
+
+              <div className="resume-cert-box">
+                <span className="cert-inst">DataCamp</span>
+                <h4 className="cert-name">Intermediate Git</h4>
+                <span className="cert-meta">Completed Oct 2026 · ID: #50,671,840 (2 hrs)</span>
+              </div>
+
+              <div className="resume-cert-box">
+                <span className="cert-inst">DataCamp</span>
+                <h4 className="cert-name">Introduction to Git</h4>
+                <span className="cert-meta">Completed Oct 2026 · ID: #50,670,457 (2 hrs)</span>
+              </div>
+
+              <div className="resume-cert-box">
+                <span className="cert-inst">Learn Technology Today</span>
+                <h4 className="cert-name">Full Stack Web Development + AI — Level 0</h4>
+                <span className="cert-meta">Issued Sep 2026 · Credential ID: LTT-COURSE-2026-000061</span>
+              </div>
+
+              <div className="resume-cert-box">
                 <span className="cert-inst">TESDA Online Program</span>
                 <h4 className="cert-name">Introduction to Visual Graphic Design</h4>
                 <span className="cert-meta">Issued Sep 2026 · Credential ID: ucil0Zg8FT</span>
@@ -317,12 +359,6 @@ export default function ResumeModal({ isOpen, onClose }) {
                 <span className="cert-inst">Python Philippines / Ateneo de Davao</span>
                 <h4 className="cert-name">Certificate of Participation — PyCon Davao 2026</h4>
                 <span className="cert-meta">Conducted Oct 2026 · Reference: PYCON-DVO-2026</span>
-              </div>
-
-              <div className="resume-cert-box">
-                <span className="cert-inst">Learn Technology Today</span>
-                <h4 className="cert-name">Full Stack Web Development + AI — Level 0</h4>
-                <span className="cert-meta">Issued Sep 2026 · Credential ID: LTT-COURSE-2026-000061</span>
               </div>
 
               <div className="resume-cert-box">

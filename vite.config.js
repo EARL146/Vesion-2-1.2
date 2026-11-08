@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: './', // Relative assets work on GitHub Pages project URLs and custom domains.
+  base: '/', // Root custom domain configuration for https://earlnis.dev
   server: {
     port: 3000,
     open: true
