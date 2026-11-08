@@ -1,66 +1,73 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ChevronDown,
-  Check,
-  Copy,
   Send,
-  FileText,
   Mail,
-  ShieldCheck,
+  CheckCircle2,
   AlertCircle,
+  ShieldCheck,
   Loader2,
   Sparkles,
-  Lock,
-  ArrowLeft,
-  RefreshCw
+  Linkedin,
+  Github,
+  Code2
 } from 'lucide-react';
-import { FAQS, PROFILE } from '../data/site';
-import {
-  ArrowUpRightIcon,
-  GitHubIcon,
-  LinkedInIcon,
-  MailSolidIcon
-} from '../components/Icons';
-import { checkEmailRules, verifyEmailDomainMX } from '../lib/emailVerify';
+import { PROFILE, FAQS } from '../data/site';
+import { verifyEmailAccount } from '../lib/emailVerify';
 
-function generateChallengeCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let out = '';
-  for (let i = 0; i < 6; i += 1) {
-    out += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return out;
+const MAX_NAME = 80;
+const MAX_EMAIL = 254;
+const MAX_MESSAGE = 5000;
+const SEND_DELAY_MS = 650;
+
+const CTRL_SINGLE_LINE = new RegExp('[\\u0000-\\u001F\\u007F]', 'g');
+const CTRL_MULTI_LINE = new RegExp('[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]', 'g');
+const BIDI_CHARS = new RegExp('[\\u200B-\\u200F\\u202A-\\u202E\\u2060\\uFEFF]', 'g');
+
+function sanitizeText(value, multiline = false) {
+  const ctrl = multiline ? CTRL_MULTI_LINE : CTRL_SINGLE_LINE;
+  return String(value ?? '').replace(ctrl, '').replace(BIDI_CHARS, '');
 }
 
-export default function ContactPage({ onOpenResume }) {
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const ArrowUpRightIcon = ({ size = 15, className = '' }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.4"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <line x1="7" y1="17" x2="17" y2="7" />
+    <polyline points="7 7 17 7 17 17" />
+  </svg>
+);
+
+export default function ContactPage() {
   const [openIdx, setOpenIdx] = useState(0);
-  const [copied, setCopied] = useState(false);
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
     email: '',
     message: ''
   });
+  const [state, setState] = useState({ kind: 'idle', via: 'mailto', note: '' });
+  const [shakeKey, setShakeKey] = useState(0);
+
+  // Live real-email DNS MX check
   const [emailState, setEmailState] = useState({
-    status: 'idle', // 'idle' | 'checking' | 'valid' | 'error' | 'typo'
+    status: 'idle', // 'idle' | 'checking' | 'valid' | 'typo' | 'invalid'
     message: '',
     suggestion: '',
     mx: ''
   });
 
-  // Flow stage: 'compose' -> 'verify' -> 'done'
-  const [stage, setStage] = useState('compose');
-  const [confirmEmail, setConfirmEmail] = useState('');
-  const [challengeCode, setChallengeCode] = useState(() => generateChallengeCode());
-  const [enteredCode, setEnteredCode] = useState('');
-  const [ownershipChecked, setOwnershipChecked] = useState(false);
-
-  const [sending, setSending] = useState(false);
-  const [sentMode, setSentMode] = useState(null); // 'direct' | 'gmail' | null
-  const [errorMsg, setErrorMsg] = useState('');
-  const [lastSentAt, setLastSentAt] = useState(0);
-
-  // Real-time email verification (syntax + anti-disposable + live DNS MX check)
   useEffect(() => {
     const raw = form.email.trim();
     if (!raw) {
@@ -68,44 +75,39 @@ export default function ContactPage({ onOpenResume }) {
       return;
     }
 
-    const syncCheck = checkEmailRules(raw);
-    if (!syncCheck.valid) {
-      setEmailState({
-        status: syncCheck.status,
-        message: syncCheck.message,
-        suggestion: syncCheck.suggestion || '',
-        mx: ''
-      });
-      return;
-    }
-
     let cancelled = false;
-    setEmailState({
+    setEmailState((prev) => ({
+      ...prev,
       status: 'checking',
-      message: `Verifying @${syncCheck.domain} mail server...`,
-      suggestion: '',
-      mx: ''
-    });
+      message: 'Checking mail server...'
+    }));
 
     const timer = setTimeout(async () => {
-      const dns = await verifyEmailDomainMX(syncCheck.domain);
+      const res = await verifyEmailAccount(raw);
       if (cancelled) return;
-      if (dns.ok) {
+      if (res.valid) {
         setEmailState({
           status: 'valid',
-          message: dns.reason,
+          message: res.message,
           suggestion: '',
-          mx: `Verified MX (@${syncCheck.domain})`
+          mx: res.mx || ''
+        });
+      } else if (res.suggestion) {
+        setEmailState({
+          status: 'typo',
+          message: res.reason,
+          suggestion: res.suggestion,
+          mx: ''
         });
       } else {
         setEmailState({
-          status: 'error',
-          message: dns.reason,
+          status: 'invalid',
+          message: res.reason,
           suggestion: '',
           mx: ''
         });
       }
-    }, 360);
+    }, 320);
 
     return () => {
       cancelled = true;
@@ -113,206 +115,116 @@ export default function ContactPage({ onOpenResume }) {
     };
   }, [form.email]);
 
-  const handleCopyEmail = async () => {
-    try {
-      await navigator.clipboard.writeText(PROFILE.email);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2200);
-    } catch {
-      // Ignore if clipboard unavailable
+  const handleApplySuggestion = () => {
+    if (!emailState.suggestion) return;
+    setForm((prev) => ({ ...prev, email: emailState.suggestion }));
+    setState((prev) => (prev.kind === 'error' ? { kind: 'idle', via: 'mailto', note: '' } : prev));
+  };
+
+  async function deliverInquiry(clean) {
+    const accessKey = import.meta.env.VITE_WEB3FORMS_KEY;
+
+    // 1. Optional Web3Forms webhook if configured in .env
+    if (accessKey) {
+      const payload = new FormData();
+      payload.append('access_key', accessKey);
+      payload.append('name', `${clean.firstName} ${clean.lastName}`);
+      payload.append('email', clean.email);
+      payload.append('subject', `Project inquiry from ${clean.firstName} ${clean.lastName}`);
+      payload.append('message', clean.message);
+      payload.append('botcheck', '');
+
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: payload,
+        headers: { Accept: 'application/json' }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        return { via: 'webhook' };
+      }
     }
-  };
 
-  const openGmailDraft = () => {
-    const fullName = `${form.firstName} ${form.lastName}`.trim().slice(0, 120) || 'Visitor';
-    const cleanEmail = form.email.trim().toLowerCase().slice(0, 120);
-    const cleanMsg = form.message.trim().slice(0, 2000);
-    const url = new URL(PROFILE.gmail);
-    url.searchParams.set('su', `[Verified Inquiry] ${fullName} (${cleanEmail})`);
-    url.searchParams.set(
-      'body',
-      `Hi Earl,\n\nVerified Sender: ${fullName}\nVerified Email: ${cleanEmail}\n\nProject details:\n${cleanMsg}`
-    );
-    window.open(url.toString(), '_blank', 'noopener,noreferrer');
-  };
+    // 2. Sir Kenneth Villar's exact mailto delivery to earlypajo@gmail.com
+    const subject = `Project inquiry from ${clean.firstName} ${clean.lastName}`;
+    const body = [
+      `Name: ${clean.firstName} ${clean.lastName}`,
+      `Email: ${clean.email}`,
+      '',
+      clean.message
+    ].join('\n');
 
-  // Step 1 -> Step 2 (Validate fields & MX record, then open Account Verification gate)
-  const handleProceedToVerify = async (e) => {
+    window.location.href = `mailto:${encodeURIComponent(PROFILE.email)}?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+
+    return { via: 'mailto' };
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMsg('');
+    const formData = new FormData(e.currentTarget);
+    const trap = String(formData.get('website') ?? '');
+    if (trap) return;
 
-    // 1. Honeypot anti-bot check
-    const honey = e.currentTarget.elements?.namedItem('botcheck')?.value;
-    if (honey) {
-      setSentMode('direct');
-      setStage('done');
-      return;
-    }
-
-    // 2. Client-side cooldown (30s between submissions)
-    const now = Date.now();
-    if (now - lastSentAt < 30000) {
-      setErrorMsg('Please wait 30 seconds before sending another message.');
-      return;
-    }
-
-    // 3. Input sanitization & validation
-    const firstName = form.firstName.trim().slice(0, 60);
-    const lastName = form.lastName.trim().slice(0, 60);
-    const email = form.email.trim().toLowerCase().slice(0, 120);
-    const message = form.message.trim().slice(0, 2000);
+    const firstName = sanitizeText(form.firstName).trim().slice(0, MAX_NAME);
+    const lastName = sanitizeText(form.lastName).trim().slice(0, MAX_NAME);
+    const email = sanitizeText(form.email).trim().toLowerCase().slice(0, MAX_EMAIL);
+    const message = sanitizeText(form.message, true).trim().slice(0, MAX_MESSAGE);
 
     if (!firstName || !lastName || !email || !message) {
-      setErrorMsg('Please fill out all required fields.');
+      setState({
+        kind: 'error',
+        via: 'mailto',
+        note: 'Add your name, a real email, and a short note.'
+      });
+      setShakeKey((k) => k + 1);
       return;
     }
 
-    // 4. Strict Email Rules + Live DNS MX Verification
-    const ruleCheck = checkEmailRules(email);
-    if (!ruleCheck.valid) {
+    const emailCheck = await verifyEmailAccount(email);
+    if (!emailCheck.valid) {
       setEmailState({
-        status: ruleCheck.status,
-        message: ruleCheck.message,
-        suggestion: ruleCheck.suggestion || '',
+        status: emailCheck.suggestion ? 'typo' : 'invalid',
+        message: emailCheck.reason,
+        suggestion: emailCheck.suggestion || '',
         mx: ''
       });
-      setErrorMsg(ruleCheck.message);
-      return;
-    }
-
-    setSending(true);
-    const dnsCheck = await verifyEmailDomainMX(ruleCheck.domain);
-    setSending(false);
-
-    if (!dnsCheck.ok) {
-      setEmailState({
-        status: 'error',
-        message: dnsCheck.reason,
-        suggestion: '',
-        mx: ''
+      setState({
+        kind: 'error',
+        via: 'mailto',
+        note: emailCheck.reason || 'Add your name, a real email, and a short note.'
       });
-      setErrorMsg(dnsCheck.reason);
+      setShakeKey((k) => k + 1);
       return;
     }
 
-    // Move to Step 2: Account Verification Gate
-    setChallengeCode(generateChallengeCode());
-    setEnteredCode('');
-    setConfirmEmail('');
-    setOwnershipChecked(false);
-    setErrorMsg('');
-    setStage('verify');
-  };
-
-  // Step 2 -> Step 3 (Verify Account Ownership & Deliver to earlypajo@gmail.com)
-  const handleConfirmAndSend = async (e) => {
-    e.preventDefault();
-    setErrorMsg('');
-
-    const cleanOriginal = form.email.trim().toLowerCase();
-    const cleanConfirm = confirmEmail.trim().toLowerCase();
-
-    if (cleanConfirm !== cleanOriginal) {
-      setErrorMsg('Confirmation email does not match. Please type your exact email address.');
-      return;
-    }
-
-    if (enteredCode.trim().toUpperCase() !== challengeCode) {
-      setErrorMsg('Incorrect verification code. Please enter the 6-character code shown.');
-      return;
-    }
-
-    if (!ownershipChecked) {
-      setErrorMsg('Please confirm that this is your active email account.');
-      return;
-    }
-
-    setSending(true);
-    const firstName = form.firstName.trim().slice(0, 60);
-    const lastName = form.lastName.trim().slice(0, 60);
-    const fullName = `${firstName} ${lastName}`.trim();
-    const message = form.message.trim().slice(0, 2000);
-
-    const rawKey = (import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || '').trim();
-    const hasRealKey = rawKey && rawKey !== 'YOUR_WEB3FORMS_ACCESS_KEY';
-
+    setState({ kind: 'sending', via: 'mailto', note: '' });
     try {
-      if (hasRealKey) {
-        const payload = new FormData();
-        payload.set('access_key', rawKey);
-        payload.set('botcheck', '');
-        payload.set('name', fullName);
-        payload.set('email', cleanOriginal);
-        payload.set('replyto', cleanOriginal);
-        payload.set('subject', `[Verified Portfolio Inquiry] ${fullName}`);
-        payload.set('message', `Verified Sender: ${fullName} (${cleanOriginal})\n\n${message}`);
-
-        const res = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          body: payload,
-          headers: { Accept: 'application/json' }
-        });
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-          throw new Error(data.message || 'Could not submit via Web3Forms.');
-        }
-        setSentMode('direct');
-      } else {
-        // Deliver directly to earlypajo@gmail.com via FormSubmit AJAX endpoint
-        const res = await fetch(`https://formsubmit.co/ajax/${PROFILE.email}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          },
-          body: JSON.stringify({
-            name: fullName,
-            email: cleanOriginal,
-            _replyto: cleanOriginal,
-            _subject: `[Verified Portfolio Inquiry] ${fullName} (${cleanOriginal})`,
-            message,
-            verified_mx: emailState.mx || 'Verified DNS MX',
-            _template: 'table'
-          })
-        });
-        const data = await res.json().catch(() => ({}));
-        if (res.ok && (data.success === 'true' || data.success === true)) {
-          setSentMode('direct');
-        } else {
-          // Fallback: open verified Gmail draft directly from visitor's Google account
-          openGmailDraft();
-          setSentMode('gmail');
-        }
-      }
-
-      setLastSentAt(Date.now());
-      setStage('done');
+      const [result] = await Promise.all([
+        deliverInquiry({ firstName, lastName, email, message }),
+        sleep(SEND_DELAY_MS)
+      ]);
+      setState({ kind: 'sent', via: result.via, note: '' });
     } catch {
-      openGmailDraft();
-      setLastSentAt(Date.now());
-      setSentMode('gmail');
-      setStage('done');
-    } finally {
-      setSending(false);
+      setState({
+        kind: 'error',
+        via: 'mailto',
+        note: 'That did not go through. Email me directly instead.'
+      });
+      setShakeKey((k) => k + 1);
     }
   };
 
-  const handleResetFlow = () => {
-    setForm({ firstName: '', lastName: '', email: '', message: '' });
-    setEmailState({ status: 'idle', message: '', suggestion: '', mx: '' });
-    setConfirmEmail('');
-    setEnteredCode('');
-    setOwnershipChecked(false);
-    setErrorMsg('');
-    setSentMode(null);
-    setStage('compose');
-  };
+  const isSending = state.kind === 'sending';
 
   return (
-    <section className="page-view page-contact" aria-label="FAQs and Contact">
+    <section className="page-view page-contact" aria-labelledby="contact-title">
       <header className="view__head">
-        <span className="view__eyebrow">FAQS / CONTACT</span>
-        <h2 className="view__title">Work worth doing. Tools worth building.</h2>
+        <span className="view__eyebrow">FAQs / Contact</span>
+        <h1 className="view__title" id="contact-title">
+          Work worth doing. Tools worth building.
+        </h1>
         <p className="view__lede">
           Tell me what you want to build. Share a short outline and I will reply with a realistic plan.
         </p>
@@ -320,293 +232,134 @@ export default function ContactPage({ onOpenResume }) {
 
       <div className="sweep-glass cgrid__shell">
         {/* Left Dark Navy FAQ Card */}
-        <aside className="cgrid__aside">
+        <aside className="cgrid__aside" aria-labelledby="contact-faq">
           <div className="cgrid__aside-head">
-            <span className="cgrid__eyebrow">FAQS</span>
-            <h3 className="cgrid__aside-title">
+            <span className="cgrid__eyebrow">FAQs</span>
+            <h2 className="cgrid__aside-title" id="contact-faq">
               <strong>Quick answers.</strong>
-              <span className="only-desktop">Still have one? Write on the right.</span>
-              <span className="only-mobile">Still have one? Use the form above.</span>
-            </h3>
+              <span>Still have one? Write below.</span>
+            </h2>
           </div>
 
-          <div className="cgrid__faqs">
+          <ul className="cgrid__faqs" role="list">
             {FAQS.map((item, idx) => {
               const isOpen = openIdx === idx;
               return (
-                <div key={item.q} className={`cgrid__faq ${isOpen ? 'is-open' : ''}`}>
+                <li key={item.q} className={`cgrid__faq${isOpen ? ' is-open' : ''}`}>
                   <button
                     type="button"
                     className="cgrid__faq-q"
                     aria-expanded={isOpen}
-                    onClick={() => setOpenIdx(isOpen ? -1 : idx)}
+                    aria-controls={`cfaq-${idx}`}
+                    onClick={() => setOpenIdx(isOpen ? null : idx)}
                   >
-                    <span className="cgrid__step-index">{String(idx + 1).padStart(2, '0')}</span>
+                    <span className="cgrid__step-index" aria-hidden="true">
+                      {String(idx + 1).padStart(2, '0')}
+                    </span>
                     <span className="cgrid__faq-text">{item.q}</span>
-                    <ChevronDown size={15} className="cgrid__faq-caret" />
+                    <ChevronDown size={15} className="cgrid__faq-caret" aria-hidden="true" />
                   </button>
-                  {isOpen && <p className="cgrid__faq-a">{item.a}</p>}
-                </div>
+                  <div className="cgrid__faq-a" id={`cfaq-${idx}`} hidden={!isOpen}>
+                    <p>{item.a}</p>
+                  </div>
+                </li>
               );
             })}
-          </div>
+          </ul>
 
           <div className="cgrid__direct">
-            <button
-              type="button"
-              className="cgrid__mail"
-              onClick={handleCopyEmail}
-              title="Click to copy email address"
-            >
-              <Mail size={14} className="cgrid__mail-icon" />
-              <span>{copied ? 'Copied earlypajo@gmail.com!' : PROFILE.email}</span>
-              {copied ? <Check size={13} /> : <Copy size={13} className="cgrid__mail-copy" />}
-            </button>
+            <a className="cgrid__mail" href={`mailto:${PROFILE.email}`}>
+              <Mail size={15} className="cgrid__mail-icon" aria-hidden="true" />
+              <span>{PROFILE.email}</span>
+            </a>
 
-            <div className="cgrid__socials">
-              <a
-                href={PROFILE.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cgrid__social"
-                aria-label="LinkedIn"
-                title="LinkedIn"
-              >
-                <LinkedInIcon size={16} />
-              </a>
-              <a
-                href={PROFILE.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cgrid__social"
-                aria-label="GitHub"
-                title="GitHub"
-              >
-                <GitHubIcon size={16} />
-              </a>
-              <a
-                href={PROFILE.gmail}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cgrid__social"
-                aria-label="Open Gmail Compose"
-                title="Open Gmail Compose"
-              >
-                <MailSolidIcon size={16} />
-              </a>
-              <button
-                type="button"
-                className="cgrid__social"
-                onClick={onOpenResume}
-                aria-label="Open Resume / CV"
-                title="View Resume / CV"
-              >
-                <FileText size={16} />
-              </button>
-            </div>
+            <ul className="cgrid__socials" role="list">
+              <li>
+                <a
+                  href={PROFILE.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cgrid__social"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin size={15} />
+                </a>
+              </li>
+              <li>
+                <a
+                  href={PROFILE.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cgrid__social"
+                  aria-label="GitHub"
+                >
+                  <Github size={15} />
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`mailto:${PROFILE.email}`}
+                  className="cgrid__social"
+                  aria-label="Email"
+                >
+                  <Mail size={15} />
+                </a>
+              </li>
+              <li>
+                <a
+                  href={PROFILE.v1}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cgrid__social"
+                  aria-label="Portfolio v1"
+                >
+                  <Code2 size={15} />
+                </a>
+              </li>
+            </ul>
           </div>
         </aside>
 
-        {/* Right Form Panel */}
+        {/* Right Contact Form Panel (Matches Sir Kenneth Villar's ContactGrid 1:1) */}
         <div className="cgrid__panel">
-          {/* Step Progress Bar */}
-          <div className="cgrid__steps" aria-label="Contact verification progress">
-            <div className={`cgrid__step-pill ${stage === 'compose' ? 'is-active' : 'is-done'}`}>
-              <span>1</span>
-              <strong>Write</strong>
-            </div>
-            <span className="cgrid__step-line" />
-            <div
-              className={`cgrid__step-pill ${
-                stage === 'verify' ? 'is-active' : stage === 'done' ? 'is-done' : ''
-              }`}
-            >
-              <span>2</span>
-              <strong>Verify Account</strong>
-            </div>
-            <span className="cgrid__step-line" />
-            <div className={`cgrid__step-pill ${stage === 'done' ? 'is-active is-done' : ''}`}>
-              <span>3</span>
-              <strong>Sent to Gmail</strong>
-            </div>
-          </div>
-
-          {stage === 'done' && (
-            <div className="cgrid__done" role="status" aria-live="polite">
-              <span className="cgrid__done-mark">
-                <Check size={28} />
+          {state.kind === 'sent' ? (
+            <div className="cgrid__done" role="status">
+              <span className="cgrid__done-mark" aria-hidden="true">
+                <CheckCircle2 size={30} />
               </span>
-              <span className="cgrid__verified-pill">
-                <ShieldCheck size={14} />
-                <span>Account Verified · {form.email.trim().toLowerCase()}</span>
-              </span>
-              <h3 className="cgrid__done-title">
-                {sentMode === 'direct'
-                  ? 'Verified & sent to Earl’s Gmail!'
-                  : 'Verified & opened in your Gmail!'}
-              </h3>
+              <h2 className="cgrid__done-title">
+                {state.via === 'webhook' ? 'Got it.' : 'Your mail app has it.'}
+              </h2>
               <p className="cgrid__done-body">
-                {sentMode === 'direct'
-                  ? `Your email account (${form.email.trim().toLowerCase()}) has been verified and your message was delivered directly to ${PROFILE.email}. Earl will reply straight to your inbox.`
-                  : `Your email (${form.email.trim().toLowerCase()}) was verified and your Gmail compose tab is ready to send directly to ${PROFILE.email}.`}
+                {state.via === 'webhook'
+                  ? 'It is in my inbox and on my phone. You will hear back within one business day.'
+                  : 'The message is laid out and addressed. Press send there and you will hear back within one business day.'}
               </p>
-
-              <div className="cgrid__done-actions">
-                <button
-                  type="button"
-                  className="cgrid__gmail-btn"
-                  onClick={openGmailDraft}
-                >
-                  <Mail size={14} />
-                  <span>Also open in Gmail app ↗</span>
-                </button>
-                <button
-                  type="button"
-                  className="cgrid__again"
-                  onClick={handleResetFlow}
-                >
-                  Write another message
-                </button>
-              </div>
+              <button
+                type="button"
+                className="cgrid__again"
+                onClick={() => {
+                  setForm({ firstName: '', lastName: '', email: '', message: '' });
+                  setEmailState({ status: 'idle', message: '', suggestion: '', mx: '' });
+                  setState({ kind: 'idle', via: 'mailto', note: '' });
+                }}
+              >
+                Write another
+              </button>
             </div>
-          )}
-
-          {stage === 'verify' && (
-            <form className="cgrid__verify" onSubmit={handleConfirmAndSend}>
-              <div className="cgrid__verify-head">
-                <span className="cgrid__verify-icon">
-                  <Lock size={18} />
-                </span>
-                <div>
-                  <h4>Verify your email account before sending</h4>
-                  <p>
-                    To prevent fake accounts and make sure Earl can reply to you, please confirm ownership of{' '}
-                    <strong>{form.email.trim().toLowerCase()}</strong>.
-                  </p>
-                </div>
-              </div>
-
-              <div className="cgrid__verify-summary">
-                <div>
-                  <small>VERIFIED SENDER</small>
-                  <strong>{`${form.firstName} ${form.lastName}`.trim()}</strong>
-                </div>
-                <div>
-                  <small>MAIL SERVER (DNS MX)</small>
-                  <strong className="is-green">
-                    <ShieldCheck size={13} /> {emailState.mx || 'Active MX Server'}
-                  </strong>
-                </div>
-                <div>
-                  <small>RECIPIENT INBOX</small>
-                  <strong>{PROFILE.email}</strong>
-                </div>
-              </div>
-
-              <label className="cgrid__field">
-                <span className="cgrid__label">
-                  STEP 1 · RE-TYPE EMAIL TO CONFIRM ACCOUNT
-                </span>
-                <input
-                  type="email"
-                  required
-                  autoComplete="off"
-                  onPaste={(e) => e.preventDefault()}
-                  placeholder={form.email.trim().toLowerCase()}
-                  value={confirmEmail}
-                  onChange={(e) => {
-                    setErrorMsg('');
-                    setConfirmEmail(e.target.value);
-                  }}
-                />
-              </label>
-
-              <div className="cgrid__field">
-                <div className="cgrid__label-row">
-                  <span className="cgrid__label">STEP 2 · SECURITY VERIFICATION CODE</span>
-                  <button
-                    type="button"
-                    className="cgrid__code-refresh"
-                    onClick={() => {
-                      setChallengeCode(generateChallengeCode());
-                      setEnteredCode('');
-                    }}
-                  >
-                    <RefreshCw size={11} /> New code
-                  </button>
-                </div>
-
-                <div className="cgrid__challenge-row">
-                  <div className="cgrid__challenge-box" aria-label="Security code">
-                    {challengeCode}
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    maxLength={6}
-                    placeholder="Enter 6-character code"
-                    value={enteredCode}
-                    onChange={(e) => {
-                      setErrorMsg('');
-                      setEnteredCode(e.target.value.toUpperCase());
-                    }}
-                  />
-                </div>
-              </div>
-
-              <label className="cgrid__check">
-                <input
-                  type="checkbox"
-                  checked={ownershipChecked}
-                  onChange={(e) => {
-                    setErrorMsg('');
-                    setOwnershipChecked(e.target.checked);
-                  }}
-                />
-                <span>
-                  I confirm that <strong>{form.email.trim().toLowerCase()}</strong> is my real, active email account and I authorize sending this inquiry to <strong>{PROFILE.email}</strong>.
-                </span>
-              </label>
-
-              {errorMsg && <p className="cgrid__status">{errorMsg}</p>}
-
-              <div className="cgrid__verify-actions">
-                <button
-                  type="submit"
-                  className="cgrid__submit"
-                  disabled={sending}
-                >
-                  <ShieldCheck size={16} />
-                  <span>
-                    {sending ? 'Sending to Earl’s Gmail...' : 'Verify Account & Send to Gmail'}
-                  </span>
-                  <ArrowUpRightIcon size={14} />
-                </button>
-
-                <button
-                  type="button"
-                  className="cgrid__back-btn"
-                  onClick={() => {
-                    setErrorMsg('');
-                    setStage('compose');
-                  }}
-                >
-                  <ArrowLeft size={14} />
-                  <span>Edit message</span>
-                </button>
-              </div>
-            </form>
-          )}
-
-          {stage === 'compose' && (
-            <form className="cgrid__form" onSubmit={handleProceedToVerify}>
+          ) : (
+            <form
+              className={`cgrid__form${isSending ? ' is-sending' : ''}`}
+              onSubmit={handleSubmit}
+              noValidate
+            >
               <input
                 type="text"
-                name="botcheck"
+                name="website"
                 tabIndex={-1}
                 autoComplete="off"
-                className="cgrid__trap"
                 aria-hidden="true"
+                className="cgrid__trap"
               />
 
               <div className="cgrid__row">
@@ -614,12 +367,16 @@ export default function ContactPage({ onOpenResume }) {
                   <span className="cgrid__label">FIRST NAME</span>
                   <input
                     type="text"
-                    required
-                    maxLength={60}
+                    name="firstName"
                     autoComplete="given-name"
-                    placeholder="Maria"
+                    required
+                    maxLength={MAX_NAME}
+                    placeholder="Earl"
                     value={form.firstName}
-                    onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                    onChange={(e) => {
+                      setForm({ ...form, firstName: e.target.value });
+                      if (state.kind === 'error') setState({ kind: 'idle', via: 'mailto', note: '' });
+                    }}
                   />
                 </label>
 
@@ -627,118 +384,118 @@ export default function ContactPage({ onOpenResume }) {
                   <span className="cgrid__label">LAST NAME</span>
                   <input
                     type="text"
-                    required
-                    maxLength={60}
+                    name="lastName"
                     autoComplete="family-name"
-                    placeholder="Santos"
+                    required
+                    maxLength={MAX_NAME}
+                    placeholder="Pajo"
                     value={form.lastName}
-                    onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                    onChange={(e) => {
+                      setForm({ ...form, lastName: e.target.value });
+                      if (state.kind === 'error') setState({ kind: 'idle', via: 'mailto', note: '' });
+                    }}
                   />
                 </label>
               </div>
 
-              <div className="cgrid__field">
+              <label className="cgrid__field">
                 <div className="cgrid__label-row">
-                  <label htmlFor="contact-email" className="cgrid__label">
-                    EMAIL
-                  </label>
-
+                  <span className="cgrid__label">EMAIL</span>
                   {emailState.status === 'checking' && (
                     <span className="cgrid__email-badge is-checking">
-                      <Loader2 size={12} className="cgrid__spin" />
-                      <span>Checking mail server...</span>
+                      <Loader2 size={12} className="cgrid__spin" /> Checking mail server...
                     </span>
                   )}
-
                   {emailState.status === 'valid' && (
                     <span className="cgrid__email-badge is-valid">
-                      <ShieldCheck size={13} />
-                      <span>{emailState.message}</span>
+                      <ShieldCheck size={12} /> {emailState.message}
                     </span>
                   )}
-
-                  {(emailState.status === 'error' || emailState.status === 'typo') && (
+                  {(emailState.status === 'invalid' || emailState.status === 'typo') && (
                     <span className="cgrid__email-badge is-error">
-                      <AlertCircle size={13} />
-                      <span>Invalid / unverified email</span>
+                      <AlertCircle size={12} /> Unverified email
                     </span>
                   )}
                 </div>
 
                 <input
-                  id="contact-email"
                   type="email"
-                  required
-                  maxLength={120}
+                  name="email"
                   autoComplete="email"
-                  placeholder="maria.santos@gmail.com"
-                  className={`cgrid__email-input is-${emailState.status}`}
-                  aria-invalid={emailState.status === 'error' || emailState.status === 'typo'}
+                  required
+                  maxLength={MAX_EMAIL}
+                  placeholder="you@yourbusiness.com"
+                  className={`cgrid__email-input ${
+                    emailState.status === 'valid'
+                      ? 'is-valid'
+                      : emailState.status === 'invalid' || emailState.status === 'typo'
+                      ? 'is-error'
+                      : ''
+                  }`}
                   value={form.email}
                   onChange={(e) => {
-                    setErrorMsg('');
                     setForm({ ...form, email: e.target.value });
+                    if (state.kind === 'error') setState({ kind: 'idle', via: 'mailto', note: '' });
                   }}
                 />
 
-                {(emailState.status === 'error' || emailState.status === 'typo') && (
+                {(emailState.status === 'invalid' || emailState.status === 'typo') && (
                   <div className="cgrid__email-feedback" role="alert">
                     <span>{emailState.message}</span>
                     {emailState.suggestion && (
                       <button
                         type="button"
                         className="cgrid__email-fix"
-                        onClick={() =>
-                          setForm((prev) => ({ ...prev, email: emailState.suggestion }))
-                        }
+                        onClick={handleApplySuggestion}
                       >
-                        <Sparkles size={11} />
-                        <span>Use {emailState.suggestion}</span>
+                        <Sparkles size={12} /> Use {emailState.suggestion}
                       </button>
                     )}
                   </div>
                 )}
-              </div>
+              </label>
 
               <label className="cgrid__field cgrid__field--grow">
                 <span className="cgrid__label">TELL ME MORE ABOUT YOUR PROJECT</span>
                 <textarea
+                  name="message"
                   required
-                  rows={5}
-                  maxLength={2000}
+                  maxLength={MAX_MESSAGE}
                   placeholder="What are we building? Which features matter most? What is your target timeline?"
                   value={form.message}
-                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  onChange={(e) => {
+                    setForm({ ...form, message: e.target.value });
+                    if (state.kind === 'error') setState({ kind: 'idle', via: 'mailto', note: '' });
+                  }}
                 />
               </label>
 
-              {errorMsg && <p className="cgrid__status">{errorMsg}</p>}
-
               <div className="cgrid__actions">
                 <button
+                  key={shakeKey}
                   type="submit"
-                  className={`cgrid__submit ${sending ? 'is-sending' : ''}`}
-                  disabled={
-                    sending ||
-                    emailState.status === 'error' ||
-                    emailState.status === 'typo' ||
-                    emailState.status === 'checking'
-                  }
+                  className={`cgrid__submit${isSending ? ' is-sending' : ''}${
+                    state.kind === 'error' ? ' is-shaking' : ''
+                  }`}
+                  disabled={isSending}
                 >
                   <span className="cgrid__submit-plane" aria-hidden="true">
-                    <Send size={15} />
+                    <Send size={16} />
                   </span>
                   <span className="cgrid__submit-label">
-                    {sending ? 'Verifying mail server...' : 'Send message'}
+                    {isSending ? 'Sending' : 'Send message'}
                   </span>
-                  <span className="cgrid__submit-arrow" aria-hidden="true">
-                    <ArrowUpRightIcon size={14} />
-                  </span>
+                  <ArrowUpRightIcon size={15} className="cgrid__submit-arrow" />
                 </button>
 
-                <span className="cgrid__hint">
-                  Step 1 of 2 · Next: Verify your email account
-                </span>
+                {state.kind === 'error' ? (
+                  <span className="cgrid__status" role="alert">
+                    <AlertCircle size={15} aria-hidden="true" />
+                    <span>{state.note}</span>
+                  </span>
+                ) : (
+                  <span className="cgrid__hint">One business day. No newsletter, no drip.</span>
+                )}
               </div>
             </form>
           )}

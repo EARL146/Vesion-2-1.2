@@ -1031,85 +1031,52 @@
     }
   }
 
-  /* ---------- Contact Page: Form first, FAQ card second ---------- */
-  .cgrid__shell,
-  .cgrid__panel,
-  .cgrid__aside,
-  .cgrid__form,
-  .cgrid__verify,
-  .cgrid__field {
-    min-width: 0;
-    max-width: 100%;
-  }
-
+  /* ---------- Contact Page: Form first, FAQ card second (Matches BrewedOps 1:1) ---------- */
   .cgrid__shell {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
     padding: 0;
   }
 
   .cgrid__panel {
     order: -1;
-    padding: 18px 16px;
+  }
+
+  .cgrid__form {
+    padding: 20px 18px;
   }
 
   .cgrid__aside {
-    padding: 20px 16px;
+    padding: 22px 18px;
+  }
+
+  .cgrid__field textarea {
+    min-height: 160px;
+  }
+
+  .cgrid__social {
+    width: 44px;
+    height: 44px;
+  }
+
+  .cgrid__label,
+  .cgrid__step-index {
+    font-size: 12px;
+  }
+
+  .cgrid__hint {
+    font-size: 12.5px;
   }
 
   @media (max-width: 640px) {
-    .cgrid__steps {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 5px;
-      overflow: visible;
-      padding-bottom: 12px;
-      margin-bottom: 12px;
+    .cgrid__row {
+      grid-template-columns: minmax(0, 1fr);
     }
 
-    .cgrid__step-line {
-      display: none;
-    }
-
-    .cgrid__step-pill {
-      flex: 1 1 auto;
-      justify-content: center;
-      padding: 6px 7px;
-      font-size: 10.5px;
-      gap: 5px;
-    }
-
-    .cgrid__step-pill span {
-      width: 16px;
-      height: 16px;
-      font-size: 9.5px;
-    }
-
-    .cgrid__actions,
-    .cgrid__verify-actions {
+    .cgrid__direct {
       flex-direction: column;
-      align-items: stretch;
-      gap: 10px;
-    }
-
-    .cgrid__submit,
-    .cgrid__back-btn {
-      width: 100%;
-      justify-content: center;
-      height: 48px;
-    }
-
-    .cgrid__hint {
-      text-align: center;
-    }
-
-    .cgrid__mail {
-      width: 100%;
-      justify-content: center;
-      height: 40px;
-    }
-
-    .cgrid__socials {
-      justify-content: center;
+      align-items: flex-start;
     }
   }
 

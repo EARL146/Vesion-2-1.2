@@ -650,3 +650,34 @@ export async function verifyEmailDomainMX(domain) {
     reason: `Format verified (@${cleanDomain})`
   };
 }
+
+/**
+ * Combined syntax, typo, disposable blocklist, Gmail rules, and live DNS MX check.
+ */
+export async function verifyEmailAccount(rawEmail) {
+  const rules = checkEmailRules(rawEmail);
+  if (!rules.valid) {
+    return {
+      valid: false,
+      reason: rules.message,
+      suggestion: rules.suggestion || ''
+    };
+  }
+
+  const mxRes = await verifyEmailDomainMX(rules.domain);
+  if (!mxRes.ok) {
+    return {
+      valid: false,
+      reason: mxRes.reason,
+      suggestion: ''
+    };
+  }
+
+  return {
+    valid: true,
+    domain: rules.domain,
+    mx: mxRes.mx || '',
+    message: mxRes.reason
+  };
+}
+
