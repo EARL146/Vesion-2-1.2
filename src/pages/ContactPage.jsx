@@ -1,5 +1,16 @@
-import React, { useState } from 'react';
-import { ChevronDown, Check, Copy, Send, FileText, Mail } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import {
+  ChevronDown,
+  Check,
+  Copy,
+  Send,
+  FileText,
+  Mail,
+  ShieldCheck,
+  AlertCircle,
+  Loader2,
+  Sparkles
+} from 'lucide-react';
 import { FAQS, PROFILE } from '../data/site';
 import {
   ArrowUpRightIcon,
@@ -7,6 +18,7 @@ import {
   LinkedInIcon,
   MailSolidIcon
 } from '../components/Icons';
+import { checkEmailRules, verifyEmailDomainMX } from '../lib/emailVerify';
 
 export default function ContactPage({ onOpenResume }) {
   const [openIdx, setOpenIdx] = useState(0);
@@ -17,10 +29,64 @@ export default function ContactPage({ onOpenResume }) {
     email: '',
     message: ''
   });
+  const [emailState, setEmailState] = useState({
+    status: 'idle', // 'idle' | 'checking' | 'valid' | 'error' | 'typo'
+    message: '',
+    suggestion: ''
+  });
   const [sending, setSending] = useState(false);
   const [sentMode, setSentMode] = useState(null); // 'web3' | 'gmail' | null
   const [errorMsg, setErrorMsg] = useState('');
   const [lastSentAt, setLastSentAt] = useState(0);
+
+  // Real-time email verification (syntax + anti-disposable + live DNS MX check)
+  useEffect(() => {
+    const raw = form.email.trim();
+    if (!raw) {
+      setEmailState({ status: 'idle', message: '', suggestion: '' });
+      return;
+    }
+
+    const syncCheck = checkEmailRules(raw);
+    if (!syncCheck.valid) {
+      setEmailState({
+        status: syncCheck.status,
+        message: syncCheck.message,
+        suggestion: syncCheck.suggestion || ''
+      });
+      return;
+    }
+
+    let cancelled = false;
+    setEmailState({
+      status: 'checking',
+      message: `Verifying @${syncCheck.domain} mail server...`,
+      suggestion: ''
+    });
+
+    const timer = setTimeout(async () => {
+      const dns = await verifyEmailDomainMX(syncCheck.domain);
+      if (cancelled) return;
+      if (dns.ok) {
+        setEmailState({
+          status: 'valid',
+          message: dns.reason,
+          suggestion: ''
+        });
+      } else {
+        setEmailState({
+          status: 'error',
+          message: dns.reason,
+          suggestion: ''
+        });
+      }
+    }, 380);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [form.email]);
 
   const handleCopyEmail = async () => {
     try {
@@ -66,15 +132,36 @@ export default function ContactPage({ onOpenResume }) {
     // 3. Input sanitization & validation
     const firstName = form.firstName.trim().slice(0, 60);
     const lastName = form.lastName.trim().slice(0, 60);
-    const email = form.email.trim().slice(0, 120);
+    const email = form.email.trim().toLowerCase().slice(0, 120);
     const message = form.message.trim().slice(0, 2000);
 
     if (!firstName || !lastName || !email || !message) {
       setErrorMsg('Please fill out all required fields.');
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrorMsg('Please enter a valid email address.');
+
+    // 4. Strict Email Rules + Live DNS MX Verification
+    const ruleCheck = checkEmailRules(email);
+    if (!ruleCheck.valid) {
+      setEmailState({
+        status: ruleCheck.status,
+        message: ruleCheck.message,
+        suggestion: ruleCheck.suggestion || ''
+      });
+      setErrorMsg(ruleCheck.message);
+      return;
+    }
+
+    setSending(true);
+    const dnsCheck = await verifyEmailDomainMX(ruleCheck.domain);
+    if (!dnsCheck.ok) {
+      setSending(false);
+      setEmailState({
+        status: 'error',
+        message: dnsCheck.reason,
+        suggestion: ''
+      });
+      setErrorMsg(dnsCheck.reason);
       return;
     }
 
@@ -82,13 +169,13 @@ export default function ContactPage({ onOpenResume }) {
     const hasRealKey = rawKey && rawKey !== 'YOUR_WEB3FORMS_ACCESS_KEY';
 
     if (!hasRealKey) {
+      setSending(false);
       setLastSentAt(now);
       openGmailDraft();
       setSentMode('gmail');
       return;
     }
 
-    setSending(true);
     try {
       const fullName = `${firstName} ${lastName}`.trim();
       const payload = new FormData();
@@ -96,6 +183,7 @@ export default function ContactPage({ onOpenResume }) {
       payload.set('botcheck', '');
       payload.set('name', fullName);
       payload.set('email', email);
+      payload.set('replyto', email);
       payload.set('subject', `Portfolio Inquiry — ${fullName}`);
       payload.set('message', message);
 
@@ -111,6 +199,7 @@ export default function ContactPage({ onOpenResume }) {
       setLastSentAt(Date.now());
       setSentMode('web3');
       setForm({ firstName: '', lastName: '', email: '', message: '' });
+      setEmailState({ status: 'idle', message: '', suggestion: '' });
     } catch (err) {
       setErrorMsg(err.message || 'Delivery failed. Opening Gmail draft instead.');
       openGmailDraft();
@@ -280,18 +369,68 @@ export default function ContactPage({ onOpenResume }) {
                 </label>
               </div>
 
-              <label className="cgrid__field">
-                <span className="cgrid__label">EMAIL</span>
+              <div className="cgrid__field">
+                <div className="cgrid__label-row">
+                  <label htmlFor="contact-email" className="cgrid__label">
+                    EMAIL
+                  </label>
+
+                  {emailState.status === 'checking' && (
+                    <span className="cgrid__email-badge is-checking">
+                      <Loader2 size={12} className="cgrid__spin" />
+                      <span>Checking mail server...</span>
+                    </span>
+                  )}
+
+                  {emailState.status === 'valid' && (
+                    <span className="cgrid__email-badge is-valid">
+                      <ShieldCheck size={13} />
+                      <span>{emailState.message}</span>
+                    </span>
+                  )}
+
+                  {(emailState.status === 'error' || emailState.status === 'typo') && (
+                    <span className="cgrid__email-badge is-error">
+                      <AlertCircle size={13} />
+                      <span>Invalid / unverified email</span>
+                    </span>
+                  )}
+                </div>
+
                 <input
+                  id="contact-email"
                   type="email"
                   required
                   maxLength={120}
                   autoComplete="email"
-                  placeholder="you@yourbusiness.com"
+                  placeholder="maria.santos@gmail.com"
+                  className={`cgrid__email-input is-${emailState.status}`}
+                  aria-invalid={emailState.status === 'error' || emailState.status === 'typo'}
                   value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  onChange={(e) => {
+                    setErrorMsg('');
+                    setForm({ ...form, email: e.target.value });
+                  }}
                 />
-              </label>
+
+                {(emailState.status === 'error' || emailState.status === 'typo') && (
+                  <div className="cgrid__email-feedback" role="alert">
+                    <span>{emailState.message}</span>
+                    {emailState.suggestion && (
+                      <button
+                        type="button"
+                        className="cgrid__email-fix"
+                        onClick={() =>
+                          setForm((prev) => ({ ...prev, email: emailState.suggestion }))
+                        }
+                      >
+                        <Sparkles size={11} />
+                        <span>Use {emailState.suggestion}</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
 
               <label className="cgrid__field cgrid__field--grow">
                 <span className="cgrid__label">TELL ME MORE ABOUT YOUR PROJECT</span>
@@ -311,13 +450,18 @@ export default function ContactPage({ onOpenResume }) {
                 <button
                   type="submit"
                   className={`cgrid__submit ${sending ? 'is-sending' : ''}`}
-                  disabled={sending}
+                  disabled={
+                    sending ||
+                    emailState.status === 'error' ||
+                    emailState.status === 'typo' ||
+                    emailState.status === 'checking'
+                  }
                 >
                   <span className="cgrid__submit-plane" aria-hidden="true">
                     <Send size={15} />
                   </span>
                   <span className="cgrid__submit-label">
-                    {sending ? 'Sending...' : 'Send message'}
+                    {sending ? 'Verifying & sending...' : 'Send message'}
                   </span>
                   <span className="cgrid__submit-arrow" aria-hidden="true">
                     <ArrowUpRightIcon size={14} />
@@ -325,7 +469,7 @@ export default function ContactPage({ onOpenResume }) {
                 </button>
 
                 <span className="cgrid__hint">
-                  Replies within 24h · Direct to inbox
+                  Live DNS MX check · Blocks disposable &amp; fake emails
                 </span>
               </div>
             </form>
