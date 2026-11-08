@@ -1153,6 +1153,25 @@
     height: 48px;
   }
 
+  @media (max-width: 680px) {
+    .kchat.is-open {
+      left: 10px;
+      right: 10px;
+      bottom: calc(10px + env(safe-area-inset-bottom));
+    }
+
+    .kchat.is-open .kchat__panel {
+      width: 100%;
+      height: min(80dvh, 610px);
+      border-radius: 20px;
+    }
+
+    .kchat__chips {
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+  }
+
   .a11y {
     display: block;
     z-index: 1700;
