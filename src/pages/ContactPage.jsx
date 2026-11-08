@@ -95,7 +95,7 @@ export default function ContactPage({ onOpenResume }) {
           status: 'valid',
           message: dns.reason,
           suggestion: '',
-          mx: dns.mx || `mx.${syncCheck.domain}`
+          mx: `Verified MX (@${syncCheck.domain})`
         });
       } else {
         setEmailState({
@@ -413,7 +413,7 @@ export default function ContactPage({ onOpenResume }) {
           <div className="cgrid__steps" aria-label="Contact verification progress">
             <div className={`cgrid__step-pill ${stage === 'compose' ? 'is-active' : 'is-done'}`}>
               <span>1</span>
-              <strong>Write Message</strong>
+              <strong>Write</strong>
             </div>
             <span className="cgrid__step-line" />
             <div
@@ -505,7 +505,7 @@ export default function ContactPage({ onOpenResume }) {
 
               <label className="cgrid__field">
                 <span className="cgrid__label">
-                  STEP 1 · RE-TYPE YOUR EMAIL ADDRESS TO CONFIRM ACCOUNT
+                  STEP 1 · RE-TYPE EMAIL TO CONFIRM ACCOUNT
                 </span>
                 <input
                   type="email"
@@ -523,7 +523,7 @@ export default function ContactPage({ onOpenResume }) {
 
               <div className="cgrid__field">
                 <div className="cgrid__label-row">
-                  <span className="cgrid__label">STEP 2 · ENTER SECURITY VERIFICATION CODE</span>
+                  <span className="cgrid__label">STEP 2 · SECURITY VERIFICATION CODE</span>
                   <button
                     type="button"
                     className="cgrid__code-refresh"
@@ -572,18 +572,6 @@ export default function ContactPage({ onOpenResume }) {
 
               <div className="cgrid__verify-actions">
                 <button
-                  type="button"
-                  className="cgrid__back-btn"
-                  onClick={() => {
-                    setErrorMsg('');
-                    setStage('compose');
-                  }}
-                >
-                  <ArrowLeft size={14} />
-                  <span>Edit message</span>
-                </button>
-
-                <button
                   type="submit"
                   className="cgrid__submit"
                   disabled={sending}
@@ -593,6 +581,18 @@ export default function ContactPage({ onOpenResume }) {
                     {sending ? 'Sending to Earl’s Gmail...' : 'Verify Account & Send to Gmail'}
                   </span>
                   <ArrowUpRightIcon size={14} />
+                </button>
+
+                <button
+                  type="button"
+                  className="cgrid__back-btn"
+                  onClick={() => {
+                    setErrorMsg('');
+                    setStage('compose');
+                  }}
+                >
+                  <ArrowLeft size={14} />
+                  <span>Edit message</span>
                 </button>
               </div>
             </form>
