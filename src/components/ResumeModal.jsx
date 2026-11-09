@@ -13,8 +13,10 @@ import {
   Award, 
   Briefcase, 
   Code2, 
-  Cpu
+  Cpu,
+  ArrowUpRight
 } from 'lucide-react';
+import { PROFILE } from '../data/site';
 
 export default function ResumeModal({ isOpen, onClose }) {
   useEffect(() => {
@@ -47,8 +49,78 @@ export default function ResumeModal({ isOpen, onClose }) {
         aria-labelledby="resume-title"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top Control Bar */}
-        <div className="resume-modal-topbar">
+        {/* Mobile Pull Handle (Phone only) */}
+        <div className="resume-sheet-handle resume-only-mobile" aria-hidden="true" />
+
+        {/* Mobile Top Header (Phone only) */}
+        <div className="resume-phone-topbar resume-only-mobile">
+          <div className="resume-phone-brand">
+            <img src={PROFILE.avatarSmall} alt="" className="resume-phone-avatar" />
+            <div className="resume-phone-meta">
+              <strong className="resume-phone-name">{PROFILE.shortName}</strong>
+              <span className="resume-phone-status">
+                <span className="resume-live-dot" />
+                <span>Resume / CV</span>
+              </span>
+            </div>
+          </div>
+
+          <button 
+            type="button" 
+            className="resume-phone-close"
+            onClick={onClose}
+            aria-label="Close Resume"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Mobile Action Bar (Phone only) */}
+        <div className="resume-phone-actions resume-only-mobile">
+          <button 
+            type="button" 
+            className="resume-phone-action-btn resume-phone-action-btn--primary"
+            onClick={handlePrint}
+            title="Print or Save as PDF"
+          >
+            <Printer size={16} />
+            <span>Print / Save PDF</span>
+          </button>
+
+          <a 
+            href={PROFILE.linkedin} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="resume-phone-action-btn resume-phone-action-btn--icon"
+            title="LinkedIn"
+            aria-label="LinkedIn Profile"
+          >
+            <Linkedin size={16} />
+          </a>
+
+          <a 
+            href={PROFILE.github} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="resume-phone-action-btn resume-phone-action-btn--icon"
+            title="GitHub"
+            aria-label="GitHub Profile"
+          >
+            <Github size={16} />
+          </a>
+
+          <a 
+            href={`mailto:${PROFILE.email}`} 
+            className="resume-phone-action-btn resume-phone-action-btn--icon"
+            title="Email"
+            aria-label="Send Email"
+          >
+            <Mail size={16} />
+          </a>
+        </div>
+
+        {/* Desktop Top Control Bar (Desktop only) */}
+        <div className="resume-modal-topbar resume-only-desktop">
           <div className="resume-topbar-left">
             <span className="resume-live-badge">
               <span className="resume-live-dot" />
@@ -68,7 +140,7 @@ export default function ResumeModal({ isOpen, onClose }) {
             </button>
 
             <a 
-              href="https://www.linkedin.com/in/earlnis-pajo-272840432" 
+              href={PROFILE.linkedin} 
               target="_blank" 
               rel="noopener noreferrer" 
               className="resume-action-btn"
@@ -95,7 +167,7 @@ export default function ResumeModal({ isOpen, onClose }) {
           {/* Header */}
           <header className="resume-header">
             <div>
-              <h1 id="resume-title" className="resume-name">Earlnis Willan A. Pajo</h1>
+              <h1 id="resume-title" className="resume-name">{PROFILE.fullName}</h1>
               <p className="resume-subtitle">Full-Stack Web Developer &amp; Software Engineer</p>
               <div className="resume-journey-pill">
                 <Code2 size={12} />
@@ -106,21 +178,21 @@ export default function ResumeModal({ isOpen, onClose }) {
             <div className="resume-contact-block">
               <div className="resume-contact-item">
                 <MapPin size={13} />
-                <span>Compostela, Davao de Oro, Philippines (GMT+8)</span>
+                <span>{PROFILE.location}, Philippines (GMT+8)</span>
               </div>
               <div className="resume-contact-item">
                 <Mail size={13} />
-                <a href="mailto:earlypajo@gmail.com">earlypajo@gmail.com</a>
+                <a href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a>
               </div>
               <div className="resume-contact-item">
                 <Linkedin size={13} />
-                <a href="https://www.linkedin.com/in/earlnis-pajo-272840432" target="_blank" rel="noopener noreferrer">
-                  linkedin.com/in/earlnis-pajo-272840432
+                <a href={PROFILE.linkedin} target="_blank" rel="noopener noreferrer">
+                  linkedin.com/in/earlnis-pajo
                 </a>
               </div>
               <div className="resume-contact-item">
                 <Github size={13} />
-                <a href="https://github.com/EARL146" target="_blank" rel="noopener noreferrer">
+                <a href={PROFILE.github} target="_blank" rel="noopener noreferrer">
                   github.com/EARL146
                 </a>
               </div>
@@ -408,6 +480,20 @@ export default function ResumeModal({ isOpen, onClose }) {
               </p>
             </div>
           </section>
+
+          {/* Mobile Bottom Dismiss & Quick Actions (Phone only) */}
+          <div className="resume-phone-bottom resume-only-mobile">
+            <button
+              type="button"
+              className="resume-phone-bottom-close"
+              onClick={onClose}
+            >
+              <span>Back to Portfolio</span>
+            </button>
+            <p className="resume-phone-watermark">
+              Earlnis Willan Agang Pajo · Verified Portfolio (earlnis.dev)
+            </p>
+          </div>
 
         </div>
       </div>
