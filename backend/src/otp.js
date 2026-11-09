@@ -4,8 +4,8 @@
 
 const OTP_TTL_SECONDS = 600; // 10 minutes
 const MAX_ATTEMPTS = 5;
-const RATE_LIMIT_WINDOW_SECONDS = 600; // 10 minutes
-const MAX_SEND_REQUESTS = 3; // Max 3 code requests per window per email/IP
+const RATE_LIMIT_WINDOW_SECONDS = 180; // 3 minutes window
+const MAX_SEND_REQUESTS = 10; // Max 10 code requests per window per email/IP for smoother testing
 
 export function generateOtp() {
   const buffer = new Uint32Array(1);
@@ -30,14 +30,14 @@ export async function hashOtp(email, otp, salt) {
 
 export async function checkRateLimit(kv, identifier) {
   if (!kv) return { allowed: true };
-  const key = `ratelimit:${identifier}`;
+  const key = `ratelimit:v2:${identifier}`;
   const current = await kv.get(key);
   const count = current ? parseInt(current, 10) : 0;
 
   if (count >= MAX_SEND_REQUESTS) {
     return {
       allowed: false,
-      error: 'Too many verification code requests. Please wait 10 minutes before requesting again.'
+      error: 'Too many verification code requests. Please wait 3 minutes before requesting again.'
     };
   }
 

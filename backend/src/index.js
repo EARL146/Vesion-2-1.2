@@ -44,7 +44,7 @@ export default {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'An internal error occurred. Please try again or email directly.'
+          error: err.message || 'An internal error occurred. Please try again or email directly.'
         }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );

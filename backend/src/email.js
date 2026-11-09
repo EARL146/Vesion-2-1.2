@@ -66,7 +66,17 @@ export async function sendOtpEmail({ apiKey, toEmail, name, otp, fromAddress }) 
 
   if (!res.ok) {
     const errorText = await res.text();
-    throw new Error(`Resend API error (${res.status}): ${errorText}`);
+    let resendMessage = errorText;
+    try {
+      const parsed = JSON.parse(errorText);
+      if (parsed.message) resendMessage = parsed.message;
+    } catch {}
+
+    if (resendMessage.includes('only send testing emails')) {
+      throw new Error('Resend testing restriction: When using onboarding@resend.dev, Resend only allows sending to your registered account email (earlypajo@gmail.com). To test, please use earlypajo@gmail.com, or verify your custom domain in Resend to email all visitors.');
+    }
+
+    throw new Error(`Email provider error (${res.status}): ${resendMessage}`);
   }
 
   return await res.json();
@@ -151,7 +161,17 @@ ${escapeHtml(message)}
 
   if (!res.ok) {
     const errorText = await res.text();
-    throw new Error(`Resend API error (${res.status}): ${errorText}`);
+    let resendMessage = errorText;
+    try {
+      const parsed = JSON.parse(errorText);
+      if (parsed.message) resendMessage = parsed.message;
+    } catch {}
+
+    if (resendMessage.includes('only send testing emails')) {
+      throw new Error('Resend testing restriction: When using onboarding@resend.dev, Resend only allows sending to your registered account email (earlypajo@gmail.com). To test, please use earlypajo@gmail.com, or verify your custom domain in Resend to email all visitors.');
+    }
+
+    throw new Error(`Email provider error (${res.status}): ${resendMessage}`);
   }
 
   return await res.json();
