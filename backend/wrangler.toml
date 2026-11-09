@@ -5,6 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 ALLOWED_ORIGIN = "https://earlnis.dev"
+FROM_EMAIL = "Earlnis Portfolio <contact@earlnis.dev>"
 
 # Cloudflare KV binding for temporary hashed OTP storage & rate limiting
 [[kv_namespaces]]

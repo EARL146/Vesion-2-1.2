@@ -10,8 +10,8 @@ export async function sendOtpEmail({ apiKey, toEmail, name, otp, fromAddress }) 
     throw new Error('Secret "RESEND_API_KEY" is missing.');
   }
 
-  // Use custom domain or fallback to Resend's default onboarding sender
-  const sender = fromAddress || 'Earlnis Portfolio <onboarding@resend.dev>';
+  // Use verified custom domain (earlnis.dev) or environment variable
+  const sender = fromAddress || 'Earlnis Portfolio <contact@earlnis.dev>';
 
   const html = `
 <!DOCTYPE html>
@@ -88,7 +88,7 @@ export async function sendInquiryEmail({ apiKey, ownerEmail, visitorName, visito
   }
 
   const recipient = ownerEmail || 'earlypajo@gmail.com';
-  const sender = fromAddress || 'Earlnis Contact <onboarding@resend.dev>';
+  const sender = fromAddress || 'Earlnis Contact <contact@earlnis.dev>';
 
   const html = `
 <!DOCTYPE html>
