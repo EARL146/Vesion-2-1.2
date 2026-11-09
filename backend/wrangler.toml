@@ -9,5 +9,5 @@ ALLOWED_ORIGIN = "https://earlnis.dev"
 # Cloudflare KV binding for temporary hashed OTP storage & rate limiting
 [[kv_namespaces]]
 binding = "CONTACT_OTP"
-id = "PLACEHOLDER_KV_NAMESPACE_ID"
-preview_id = "PLACEHOLDER_PREVIEW_KV_NAMESPACE_ID"
+id = "89ea3c563c19403f85d28a259fec3f88"
+preview_id = "4991d15fd36047b58fd0b169860381b3"
