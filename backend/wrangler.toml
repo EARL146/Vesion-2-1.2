@@ -1,0 +1,13 @@
+name = "earlnis-contact-worker"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ALLOWED_ORIGIN = "https://earlnis.dev"
+
+# Cloudflare KV binding for temporary hashed OTP storage & rate limiting
+[[kv_namespaces]]
+binding = "CONTACT_OTP"
+id = "PLACEHOLDER_KV_NAMESPACE_ID"
+preview_id = "PLACEHOLDER_PREVIEW_KV_NAMESPACE_ID"

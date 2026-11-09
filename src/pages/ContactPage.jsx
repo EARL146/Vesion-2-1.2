@@ -10,15 +10,20 @@ import {
   Sparkles,
   Linkedin,
   Github,
-  Code2
+  Code2,
+  KeyRound,
+  ArrowLeft,
+  RotateCw
 } from 'lucide-react';
 import { PROFILE, FAQS } from '../data/site';
 import { verifyEmailAccount } from '../lib/emailVerify';
+import { sendVerificationCode, verifyAndSendInquiry } from '../services/contactApi';
 
 const MAX_NAME = 80;
 const MAX_EMAIL = 254;
+const MAX_SUBJECT = 150;
 const MAX_MESSAGE = 5000;
-const SEND_DELAY_MS = 650;
+const RESEND_COOLDOWN_SEC = 60;
 
 const CTRL_SINGLE_LINE = new RegExp('[\\u0000-\\u001F\\u007F]', 'g');
 const CTRL_MULTI_LINE = new RegExp('[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]', 'g');
@@ -28,8 +33,6 @@ function sanitizeText(value, multiline = false) {
   const ctrl = multiline ? CTRL_MULTI_LINE : CTRL_SINGLE_LINE;
   return String(value ?? '').replace(ctrl, '').replace(BIDI_CHARS, '');
 }
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const ArrowUpRightIcon = ({ size = 15, className = '' }) => (
   <svg
@@ -51,16 +54,27 @@ const ArrowUpRightIcon = ({ size = 15, className = '' }) => (
 
 export default function ContactPage() {
   const [openIdx, setOpenIdx] = useState(0);
+
+  // Form fields
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    subject: '',
     message: ''
   });
-  const [state, setState] = useState({ kind: 'idle', via: 'mailto', note: '' });
+
+  // Flow stage: 'compose' | 'verify' | 'done'
+  const [stage, setStage] = useState('compose');
+  const [otp, setOtp] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const [shakeKey, setShakeKey] = useState(0);
 
-  // Live real-email DNS MX check
+  // Cooldown countdown for resending code
+  const [cooldown, setCooldown] = useState(0);
+
+  // Live DNS-over-HTTPS real-email check
   const [emailState, setEmailState] = useState({
     status: 'idle', // 'idle' | 'checking' | 'valid' | 'typo' | 'invalid'
     message: '',
@@ -68,6 +82,16 @@ export default function ContactPage() {
     mx: ''
   });
 
+  // Cooldown timer interval
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const interval = setInterval(() => {
+      setCooldown((c) => Math.max(0, c - 1));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [cooldown]);
+
+  // Real-time email validation
   useEffect(() => {
     const raw = form.email.trim();
     if (!raw) {
@@ -118,66 +142,27 @@ export default function ContactPage() {
   const handleApplySuggestion = () => {
     if (!emailState.suggestion) return;
     setForm((prev) => ({ ...prev, email: emailState.suggestion }));
-    setState((prev) => (prev.kind === 'error' ? { kind: 'idle', via: 'mailto', note: '' } : prev));
+    setErrorMsg('');
   };
 
-  async function deliverInquiry(clean) {
-    const accessKey = import.meta.env.VITE_WEB3FORMS_KEY;
-
-    // 1. Optional Web3Forms webhook if configured in .env
-    if (accessKey) {
-      const payload = new FormData();
-      payload.append('access_key', accessKey);
-      payload.append('name', `${clean.firstName} ${clean.lastName}`);
-      payload.append('email', clean.email);
-      payload.append('subject', `Project inquiry from ${clean.firstName} ${clean.lastName}`);
-      payload.append('message', clean.message);
-      payload.append('botcheck', '');
-
-      const res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        body: payload,
-        headers: { Accept: 'application/json' }
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        return { via: 'webhook' };
-      }
-    }
-
-    // 2. Sir Kenneth Villar's exact mailto delivery to earlypajo@gmail.com
-    const subject = `Project inquiry from ${clean.firstName} ${clean.lastName}`;
-    const body = [
-      `Name: ${clean.firstName} ${clean.lastName}`,
-      `Email: ${clean.email}`,
-      '',
-      clean.message
-    ].join('\n');
-
-    window.location.href = `mailto:${encodeURIComponent(PROFILE.email)}?subject=${encodeURIComponent(
-      subject
-    )}&body=${encodeURIComponent(body)}`;
-
-    return { via: 'mailto' };
-  }
-
-  const handleSubmit = async (e) => {
+  /**
+   * STAGE 1: Request OTP verification code
+   */
+  const handleRequestCode = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const trap = String(formData.get('website') ?? '');
-    if (trap) return;
+    if (trap) return; // bot detected
 
     const firstName = sanitizeText(form.firstName).trim().slice(0, MAX_NAME);
     const lastName = sanitizeText(form.lastName).trim().slice(0, MAX_NAME);
+    const fullName = `${firstName} ${lastName}`.trim();
     const email = sanitizeText(form.email).trim().toLowerCase().slice(0, MAX_EMAIL);
+    const subject = sanitizeText(form.subject).trim().slice(0, MAX_SUBJECT);
     const message = sanitizeText(form.message, true).trim().slice(0, MAX_MESSAGE);
 
-    if (!firstName || !lastName || !email || !message) {
-      setState({
-        kind: 'error',
-        via: 'mailto',
-        note: 'Add your name, a real email, and a short note.'
-      });
+    if (!firstName || !lastName || !email || !subject || !message) {
+      setErrorMsg('Please fill in your name, email, subject, and message.');
       setShakeKey((k) => k + 1);
       return;
     }
@@ -190,33 +175,99 @@ export default function ContactPage() {
         suggestion: emailCheck.suggestion || '',
         mx: ''
       });
-      setState({
-        kind: 'error',
-        via: 'mailto',
-        note: emailCheck.reason || 'Add your name, a real email, and a short note.'
-      });
+      setErrorMsg(emailCheck.reason || 'Please enter a valid email address.');
       setShakeKey((k) => k + 1);
       return;
     }
 
-    setState({ kind: 'sending', via: 'mailto', note: '' });
+    setLoading(true);
+    setErrorMsg('');
+
     try {
-      const [result] = await Promise.all([
-        deliverInquiry({ firstName, lastName, email, message }),
-        sleep(SEND_DELAY_MS)
-      ]);
-      setState({ kind: 'sent', via: result.via, note: '' });
-    } catch {
-      setState({
-        kind: 'error',
-        via: 'mailto',
-        note: 'That did not go through. Email me directly instead.'
+      await sendVerificationCode({
+        name: fullName,
+        email,
+        subject,
+        message,
+        website: trap
       });
+      setStage('verify');
+      setOtp('');
+      setCooldown(RESEND_COOLDOWN_SEC);
+    } catch (err) {
+      setErrorMsg(err.message || 'Could not send verification code. Please try again.');
       setShakeKey((k) => k + 1);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const isSending = state.kind === 'sending';
+  /**
+   * Resend OTP code
+   */
+  const handleResendCode = async () => {
+    if (cooldown > 0 || loading) return;
+    setLoading(true);
+    setErrorMsg('');
+
+    const fullName = `${form.firstName} ${form.lastName}`.trim();
+    try {
+      await sendVerificationCode({
+        name: fullName,
+        email: form.email.trim().toLowerCase(),
+        subject: form.subject.trim(),
+        message: form.message.trim()
+      });
+      setCooldown(RESEND_COOLDOWN_SEC);
+      setErrorMsg('');
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to resend code.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * STAGE 2: Verify OTP and deliver message to Gmail
+   */
+  const handleVerifyAndSend = async (e) => {
+    e.preventDefault();
+    const cleanOtp = otp.trim();
+
+    if (!cleanOtp || !/^\d{6}$/.test(cleanOtp)) {
+      setErrorMsg('Please enter the 6-digit verification code.');
+      setShakeKey((k) => k + 1);
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg('');
+
+    const fullName = `${form.firstName} ${form.lastName}`.trim();
+    try {
+      await verifyAndSendInquiry({
+        name: fullName,
+        email: form.email.trim().toLowerCase(),
+        subject: form.subject.trim(),
+        message: form.message.trim(),
+        otp: cleanOtp
+      });
+      setStage('done');
+    } catch (err) {
+      setErrorMsg(err.message || 'Verification failed. Please check the code and try again.');
+      setShakeKey((k) => k + 1);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = () => {
+    setForm({ firstName: '', lastName: '', email: '', subject: '', message: '' });
+    setOtp('');
+    setErrorMsg('');
+    setEmailState({ status: 'idle', message: '', suggestion: '', mx: '' });
+    setStage('compose');
+  };
 
   return (
     <section className="page-view page-contact" aria-labelledby="contact-title">
@@ -320,39 +371,112 @@ export default function ContactPage() {
           </div>
         </aside>
 
-        {/* Right Contact Form Panel (Matches Sir Kenneth Villar's ContactGrid 1:1) */}
+        {/* Right Contact Form Card with Verified Flow */}
         <div className="cgrid__panel">
-          {state.kind === 'sent' ? (
+          {stage === 'done' ? (
             <div className="cgrid__done" role="status">
               <span className="cgrid__done-mark" aria-hidden="true">
-                <CheckCircle2 size={30} />
+                <CheckCircle2 size={32} />
               </span>
-              <h2 className="cgrid__done-title">
-                {state.via === 'webhook' ? 'Got it.' : 'Your mail app has it.'}
-              </h2>
+              <h2 className="cgrid__done-title">Got it. Your message is on its way.</h2>
               <p className="cgrid__done-body">
-                {state.via === 'webhook'
-                  ? 'It is in my inbox and on my phone. You will hear back within one business day.'
-                  : 'The message is laid out and addressed. Press send there and you will hear back within one business day.'}
+                Your verified inquiry has been delivered directly to Earl's inbox at{' '}
+                <strong>{PROFILE.email}</strong> with your email set as Reply-To. You will hear back within one business day.
               </p>
-              <button
-                type="button"
-                className="cgrid__again"
-                onClick={() => {
-                  setForm({ firstName: '', lastName: '', email: '', message: '' });
-                  setEmailState({ status: 'idle', message: '', suggestion: '', mx: '' });
-                  setState({ kind: 'idle', via: 'mailto', note: '' });
-                }}
-              >
+              <button type="button" className="cgrid__again" onClick={handleReset}>
                 Write another
               </button>
             </div>
+          ) : stage === 'verify' ? (
+            <form className="cgrid__form cgrid__otp-card" onSubmit={handleVerifyAndSend} noValidate>
+              <div className="cgrid__otp-info">
+                <ShieldCheck size={20} className="cgrid__otp-info-icon" />
+                <p>
+                  We sent a 6-digit verification code to <strong>{form.email}</strong>. Enter it below to verify your email and send your message.
+                </p>
+              </div>
+
+              <div className="cgrid__otp-field">
+                <label className="cgrid__label" htmlFor="otp-input">
+                  ENTER 6-DIGIT VERIFICATION CODE
+                </label>
+                <input
+                  id="otp-input"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                  placeholder="000000"
+                  autoFocus
+                  required
+                  className="cgrid__otp-input"
+                  value={otp}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                    setOtp(val);
+                    if (errorMsg) setErrorMsg('');
+                  }}
+                />
+                <span className="cgrid__otp-subtext">
+                  Code expires in <strong>10 minutes</strong>. Limit 5 attempts.
+                </span>
+              </div>
+
+              <div className="cgrid__otp-actions">
+                <button
+                  type="button"
+                  className="cgrid__back-btn"
+                  onClick={() => {
+                    setStage('compose');
+                    setErrorMsg('');
+                  }}
+                >
+                  <ArrowLeft size={14} />
+                  <span>Edit message</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="cgrid__resend-btn"
+                  disabled={cooldown > 0 || loading}
+                  onClick={handleResendCode}
+                >
+                  <RotateCw size={13} className={loading ? 'cgrid__spin' : ''} />
+                  <span>
+                    {cooldown > 0 ? `Resend code in ${cooldown}s` : 'Resend code'}
+                  </span>
+                </button>
+              </div>
+
+              <div className="cgrid__actions">
+                <button
+                  key={shakeKey}
+                  type="submit"
+                  className={`cgrid__submit${loading ? ' is-sending' : ''}${
+                    errorMsg ? ' is-shaking' : ''
+                  }`}
+                  disabled={loading || otp.trim().length !== 6}
+                >
+                  <span className="cgrid__submit-plane" aria-hidden="true">
+                    {loading ? <Loader2 size={16} className="cgrid__spin" /> : <ShieldCheck size={16} />}
+                  </span>
+                  <span className="cgrid__submit-label">
+                    {loading ? 'Verifying & Sending...' : 'Verify & Send Inquiry'}
+                  </span>
+                  <ArrowUpRightIcon size={15} className="cgrid__submit-arrow" />
+                </button>
+
+                {errorMsg && (
+                  <span className="cgrid__status" role="alert">
+                    <AlertCircle size={15} aria-hidden="true" />
+                    <span>{errorMsg}</span>
+                  </span>
+                )}
+              </div>
+            </form>
           ) : (
-            <form
-              className={`cgrid__form${isSending ? ' is-sending' : ''}`}
-              onSubmit={handleSubmit}
-              noValidate
-            >
+            <form className="cgrid__form" onSubmit={handleRequestCode} noValidate>
               <input
                 type="text"
                 name="website"
@@ -375,7 +499,7 @@ export default function ContactPage() {
                     value={form.firstName}
                     onChange={(e) => {
                       setForm({ ...form, firstName: e.target.value });
-                      if (state.kind === 'error') setState({ kind: 'idle', via: 'mailto', note: '' });
+                      if (errorMsg) setErrorMsg('');
                     }}
                   />
                 </label>
@@ -392,7 +516,7 @@ export default function ContactPage() {
                     value={form.lastName}
                     onChange={(e) => {
                       setForm({ ...form, lastName: e.target.value });
-                      if (state.kind === 'error') setState({ kind: 'idle', via: 'mailto', note: '' });
+                      if (errorMsg) setErrorMsg('');
                     }}
                   />
                 </label>
@@ -435,7 +559,7 @@ export default function ContactPage() {
                   value={form.email}
                   onChange={(e) => {
                     setForm({ ...form, email: e.target.value });
-                    if (state.kind === 'error') setState({ kind: 'idle', via: 'mailto', note: '' });
+                    if (errorMsg) setErrorMsg('');
                   }}
                 />
 
@@ -455,6 +579,22 @@ export default function ContactPage() {
                 )}
               </label>
 
+              <label className="cgrid__field">
+                <span className="cgrid__label">SUBJECT</span>
+                <input
+                  type="text"
+                  name="subject"
+                  required
+                  maxLength={MAX_SUBJECT}
+                  placeholder="Project inquiry / Full-stack app build"
+                  value={form.subject}
+                  onChange={(e) => {
+                    setForm({ ...form, subject: e.target.value });
+                    if (errorMsg) setErrorMsg('');
+                  }}
+                />
+              </label>
+
               <label className="cgrid__field cgrid__field--grow">
                 <span className="cgrid__label">TELL ME MORE ABOUT YOUR PROJECT</span>
                 <textarea
@@ -465,7 +605,7 @@ export default function ContactPage() {
                   value={form.message}
                   onChange={(e) => {
                     setForm({ ...form, message: e.target.value });
-                    if (state.kind === 'error') setState({ kind: 'idle', via: 'mailto', note: '' });
+                    if (errorMsg) setErrorMsg('');
                   }}
                 />
               </label>
@@ -474,27 +614,27 @@ export default function ContactPage() {
                 <button
                   key={shakeKey}
                   type="submit"
-                  className={`cgrid__submit${isSending ? ' is-sending' : ''}${
-                    state.kind === 'error' ? ' is-shaking' : ''
+                  className={`cgrid__submit${loading ? ' is-sending' : ''}${
+                    errorMsg ? ' is-shaking' : ''
                   }`}
-                  disabled={isSending}
+                  disabled={loading}
                 >
                   <span className="cgrid__submit-plane" aria-hidden="true">
-                    <Send size={16} />
+                    {loading ? <Loader2 size={16} className="cgrid__spin" /> : <KeyRound size={16} />}
                   </span>
                   <span className="cgrid__submit-label">
-                    {isSending ? 'Sending' : 'Send message'}
+                    {loading ? 'Sending Code...' : 'Send Verification Code'}
                   </span>
                   <ArrowUpRightIcon size={15} className="cgrid__submit-arrow" />
                 </button>
 
-                {state.kind === 'error' ? (
+                {errorMsg ? (
                   <span className="cgrid__status" role="alert">
                     <AlertCircle size={15} aria-hidden="true" />
-                    <span>{state.note}</span>
+                    <span>{errorMsg}</span>
                   </span>
                 ) : (
-                  <span className="cgrid__hint">One business day. No newsletter, no drip.</span>
+                  <span className="cgrid__hint">We verify your email with a 6-digit OTP before delivering to Gmail.</span>
                 )}
               </div>
             </form>

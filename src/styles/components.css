@@ -3564,6 +3564,138 @@
   background: var(--tint-strong);
 }
 
+/* OTP & Verified Flow additions */
+.cgrid__otp-card {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2vh, 20px);
+  animation: cgrid-rise 0.4s var(--ease-out) both;
+}
+
+.cgrid__otp-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(var(--accent-rgb), 0.08);
+  border: 1px solid rgba(var(--accent-rgb), 0.22);
+}
+
+.cgrid__otp-info-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.cgrid__otp-info p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--navy);
+}
+
+.cgrid__otp-info strong {
+  word-break: break-all;
+}
+
+.cgrid__otp-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 12px;
+  border-radius: 16px;
+  background: var(--white);
+  border: 1px solid var(--line-strong);
+}
+
+.cgrid__otp-input {
+  width: min(280px, 100%) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.38em !important;
+  text-align: center !important;
+  padding: 10px 14px !important;
+  color: var(--navy) !important;
+  background: var(--paper) !important;
+  border-radius: 12px !important;
+  border: 2px solid var(--line-strong) !important;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+
+.cgrid__otp-input:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.18) !important;
+}
+
+.cgrid__otp-subtext {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.cgrid__otp-subtext strong {
+  color: var(--navy);
+}
+
+.cgrid__otp-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.cgrid__back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--tint);
+  border: 1px solid var(--line);
+  color: var(--navy);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-fast), transform var(--dur-fast);
+}
+
+.cgrid__back-btn:hover {
+  background: var(--tint-strong);
+  transform: translateY(-1px);
+}
+
+.cgrid__resend-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 0;
+  color: var(--accent);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: opacity var(--dur-fast), background var(--dur-fast);
+}
+
+.cgrid__resend-btn:hover:not(:disabled) {
+  background: rgba(var(--accent-rgb), 0.08);
+}
+
+.cgrid__resend-btn:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 /* --------------------------------------------------------------------------
    11. PROJECT & CERTIFICATE MODALS (macOS Window Lightboxes)
    -------------------------------------------------------------------------- */

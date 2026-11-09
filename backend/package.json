@@ -1,0 +1,13 @@
+{
+  "name": "earlnis-contact-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for verified contact form submissions via Resend",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^3.109.2"
+  }
+}
