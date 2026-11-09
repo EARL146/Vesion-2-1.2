@@ -4,7 +4,7 @@
 
 const API_BASE_URL = (
   import.meta.env.VITE_CONTACT_API_URL ||
-  'https://earlnis-contact-worker.shizunyan0146.workers.dev'
+  'https://earlnis-contact-worker.earlypajo.workers.dev'
 ).replace(/\/+$/, '');
 
 export async function sendVerificationCode({ name, email, subject, message, website }) {
