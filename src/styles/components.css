@@ -3930,9 +3930,12 @@
   color: var(--cream);
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .pmodal__close-inline {
+  flex-shrink: 0;
   width: 30px;
   height: 30px;
   border-radius: 50%;

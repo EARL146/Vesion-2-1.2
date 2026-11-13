@@ -618,19 +618,28 @@
 
   /* ---------- Projects Page (Dedicated Phone & Tablet Layout) ---------- */
   .pfilter {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
+    align-items: center;
     gap: 2px;
     padding: 4px;
     border-radius: 999px;
     background: var(--tint-strong);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .pfilter::-webkit-scrollbar {
+    display: none;
   }
 
   .pfilter__chip {
-    height: 38px;
+    flex: 1 0 auto;
+    height: 36px;
+    padding: 0 8px;
     border-radius: 999px;
-    font-size: 13.5px;
+    font-size: 12.5px;
     font-weight: 600;
+    white-space: nowrap;
     color: var(--muted);
     transition: background var(--dur-fast), color var(--dur-fast), box-shadow var(--dur-fast);
   }
@@ -1100,12 +1109,41 @@
     }
 
     .ppanel__bar {
+      flex-wrap: wrap;
       padding: 10px 12px;
       gap: 8px;
     }
 
     .pmodal .ppanel__dots {
       display: none;
+    }
+
+    .ppanel__url {
+      order: 1;
+      flex: 1 1 0;
+      min-width: 0;
+      height: 32px;
+      line-height: 32px;
+    }
+
+    .pmodal__close-inline {
+      order: 2;
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    .ppanel__url ~ .ppanel__ext {
+      order: 3;
+      flex: 0 0 100%;
+      justify-content: center;
+      height: 32px;
+      gap: 6px;
+    }
+
+    .pdetail__logos {
+      flex-wrap: wrap;
     }
 
     .ppanel__scroll {
