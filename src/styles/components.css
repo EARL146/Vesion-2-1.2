@@ -407,8 +407,8 @@
   }
 }
 
-/* Wide screens: everything fits on one row again, so bring back the dividers. */
-@media (min-width: 1700px) {
+/* Ultra-wide screens: all 12 tools fit on one row, so bring back the dividers. */
+@media (min-width: 1920px) {
   .tools-bar {
     flex-wrap: nowrap;
     justify-content: space-between;

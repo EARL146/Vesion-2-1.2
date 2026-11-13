@@ -26,12 +26,14 @@ import {
   siDotnet,
   siPython,
   siDocker,
-  siPostgresql
+  siPostgresql,
+  siObsidian
 } from 'simple-icons';
 
 export const JAVA_LOGO = './tech-logos/java.svg';
 export const VSCODE_LOGO = './tech-logos/vscode.svg';
 export const OMNIROUTE_LOGO = './tech-logos/omniroute.svg';
+export const HERMES_LOGO = './tech-logos/hermes.png';
 
 export const PROFILE = {
   name: 'Earl Willan Pajo',
@@ -79,7 +81,9 @@ export const TOOLS = [
   { name: 'React', icon: siReact },
   { name: 'GitHub', icon: siGithub, mono: true },
   { name: 'VS Code', src: VSCODE_LOGO },
-  { name: 'OmniRoute', src: OMNIROUTE_LOGO }
+  { name: 'OmniRoute', src: OMNIROUTE_LOGO },
+  { name: 'Hermes', src: HERMES_LOGO },
+  { name: 'Obsidian', icon: siObsidian }
 ];
 
 export const STACK_ROWS = [
