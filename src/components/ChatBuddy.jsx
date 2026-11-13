@@ -5,14 +5,14 @@ import { PROFILE } from '../data/site';
 
 const INITIAL_MESSAGE = {
   sender: 'bot',
-  text: 'Hi! I’m EarlBot. Tap a question below or ask me about Earl’s 7 shipped projects, core tech stack, 12 verified certificates, BSIT background, or how to work together.',
+  text: 'Hi! I’m EarlBot. Tap a question below or ask me about Earl’s 12 shipped projects, core tech stack, 12 verified certificates, BSIT background, or how to work together.',
   meta: 'EarlBot · Online'
 };
 
 const KNOWLEDGE_BASE = [
   {
     triggers: ['what projects', 'shipped', 'all projects', 'projects has earl', 'portfolio projects', 'repositories', 'repos', 'built'],
-    reply: 'Earl has shipped 7 public projects on GitHub across web, Java, and mobile:',
+    reply: 'Earl has shipped 12 public projects on GitHub across web, business systems, Java, and mobile:',
     items: [
       {
         num: '01',
@@ -55,9 +55,37 @@ const KNOWLEDGE_BASE = [
         tag: 'HTML5 · CSS3 · SVG',
         desc: 'Client barbershop landing page & pure-SVG v1 portfolio.',
         to: '/projects'
+      },
+      {
+        num: '07',
+        title: 'Daylight Booking',
+        tag: 'React · Vite',
+        desc: 'Appointment system with week calendar, customers & business hours.',
+        to: '/projects'
+      },
+      {
+        num: '08',
+        title: 'Northstar CRM',
+        tag: 'JavaScript · Vite',
+        desc: 'Customers, leads, deals & reports with CSV export.',
+        to: '/projects'
+      },
+      {
+        num: '09',
+        title: 'Goodswell Commerce',
+        tag: 'JavaScript · Vite',
+        desc: 'Storefront, cart, orders & admin product catalog (demo checkout).',
+        to: '/projects'
+      },
+      {
+        num: '10',
+        title: 'CoreStack & Calc',
+        tag: 'JS · Python · SQL · Dart',
+        desc: 'Full-stack practice monorepo and web/Python calculators.',
+        to: '/projects'
       }
     ],
-    action: { label: 'Explore All 7 Projects', to: '/projects' }
+    action: { label: 'Explore All 12 Projects', to: '/projects' }
   },
   {
     triggers: ['motofix', 'moto', 'ecommerce', 'motorcycle', 'parts'],
@@ -268,7 +296,7 @@ const KNOWLEDGE_BASE = [
 ];
 
 const QUICK_PROMPTS = [
-  { label: 'Shipped projects (7)', query: 'What projects has Earl shipped?' },
+  { label: 'Shipped projects (12)', query: 'What projects has Earl shipped?' },
   { label: 'Core tech stack', query: 'What is Earl’s core tech stack?' },
   { label: '12 Certificates', query: 'Show his 12 certificates' },
   { label: 'Resume / CV', query: 'Open Resume / CV' },
@@ -329,7 +357,7 @@ export default function ChatBuddy({ onOpenResume }) {
           ...prev,
           {
             sender: 'bot',
-            text: 'Earl builds full-stack web apps, Java Spring Boot & Node.js APIs, MySQL databases and Flutter apps. Want to browse his 7 shipped projects or send a note?',
+            text: 'Earl builds full-stack web apps, Java Spring Boot & Node.js APIs, MySQL databases and Flutter apps. Want to browse his 12 shipped projects or send a note?',
             action: { label: 'Explore Projects', to: '/projects' },
             meta: 'EarlBot · just now'
           }

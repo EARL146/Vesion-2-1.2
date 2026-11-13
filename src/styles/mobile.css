@@ -642,9 +642,15 @@
   }
 
   .pgrid-bento[data-filter='web'] [data-cat]:not([data-cat~='web']),
+  .pgrid-bento[data-filter='systems'] [data-cat]:not([data-cat~='systems']),
   .pgrid-bento[data-filter='java'] [data-cat]:not([data-cat~='java']),
   .pgrid-bento[data-filter='mobile'] [data-cat]:not([data-cat~='mobile']),
-  .pgrid-bento[data-filter='lab'] [data-cat]:not([data-cat~='lab']) {
+  .pgrid-bento[data-filter='lab'] [data-cat]:not([data-cat~='lab']),
+  .pgrid-more[data-filter='web'] [data-cat]:not([data-cat~='web']),
+  .pgrid-more[data-filter='systems'] [data-cat]:not([data-cat~='systems']),
+  .pgrid-more[data-filter='java'] [data-cat]:not([data-cat~='java']),
+  .pgrid-more[data-filter='mobile'] [data-cat]:not([data-cat~='mobile']),
+  .pgrid-more[data-filter='lab'] [data-cat]:not([data-cat~='lab']) {
     display: none;
   }
 

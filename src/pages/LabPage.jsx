@@ -56,7 +56,7 @@ export default function LabPage({ onOpenProject }) {
           <div className="lab-gh-badge__card">
             <GitHubIcon size={18} />
             <div>
-              <strong>7 public repositories</strong>
+              <strong>{PROJECTS.length} projects on GitHub</strong>
               <span>Java 21 · Node.js · Flutter · Web</span>
             </div>
             <ArrowUpRightIcon size={14} />
@@ -185,7 +185,7 @@ export default function LabPage({ onOpenProject }) {
                     <span className="lab-status-box__label">TODAY</span>
                     <p>
                       <CheckCircle2 size={15} />
-                      <span>All 7 repositories documented, 12 credentials verified, static build ready for GitHub Pages.</span>
+                      <span>All {PROJECTS.length} repositories documented, 12 credentials verified, static build ready for GitHub Pages.</span>
                     </p>
                   </div>
 

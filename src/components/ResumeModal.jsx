@@ -232,7 +232,7 @@ export default function ResumeModal({ isOpen, onClose }) {
                 Engineering multi-tier full-stack systems and scalable web applications. Advancing into enterprise Java 21 with Spring Boot, Node.js &amp; Express RESTful API backends, modern React user interfaces, relational database normalization, and mobile development with Flutter.
               </p>
               <ul className="resume-bullet-list">
-                <li>Designed and deployed 7+ complete software systems (e-commerce, POS inventory, client booking, and mobile apps).</li>
+                <li>Designed and built 10+ software systems and web applications (e-commerce, CRM pipelines, client booking, POS inventory, and mobile apps).</li>
                 <li>Earned 12 accredited credentials spanning DataCamp (SQL, Python, Git &amp; GitHub), Full-Stack Web Development + AI, Cybersecurity Infrastructure, and Visual Design.</li>
               </ul>
             </div>

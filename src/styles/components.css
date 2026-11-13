@@ -374,6 +374,26 @@
 }
 
 @media (min-width: 1100px) {
+  /* 10 tools no longer fit on one row at laptop widths: tighten spacing and
+     wrap instead of clipping (the bar used to scroll with a hidden scrollbar). */
+  .tools-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 4px;
+    padding: 8px 12px;
+    overflow: visible;
+  }
+
+  .tools-bar__item + .tools-bar__item::before {
+    display: none;
+  }
+
+  .tools-bar__item {
+    padding: 2px 8px;
+    gap: 7px;
+    font-size: 12.5px;
+  }
+
   .home__tools {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -384,6 +404,18 @@
   .home__tools-head {
     padding-right: 20px;
     border-right: 1px solid var(--line-strong);
+  }
+}
+
+/* Wide screens: everything fits on one row again, so bring back the dividers. */
+@media (min-width: 1700px) {
+  .tools-bar {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+
+  .tools-bar__item + .tools-bar__item::before {
+    display: block;
   }
 }
 
@@ -1359,6 +1391,138 @@
   height: 100%;
   object-fit: cover;
   object-position: center 22%;
+}
+
+/* Inner scroller: on desktop the first bento fills the glass plate,
+   and the second "business systems" bento sits right below it. */
+.pgrid__scroll {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+@media (min-width: 1100px) {
+  .pgrid__scroll {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    margin: -6px;
+    padding: 6px;
+  }
+
+  .pgrid__scroll > .pgrid-bento:first-child {
+    flex: 0 0 100%;
+  }
+}
+
+.pgrid-more {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pgrid-more__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 2px 4px 0;
+}
+
+.pgrid-more__eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent-ink);
+  white-space: nowrap;
+}
+
+.pgrid-more__rule {
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.pgrid-more__count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+@media (min-width: 1100px) {
+  .pgrid-bento.pgrid-bento--more {
+    grid-template-columns: 1.45fr 0.8fr 0.8fr;
+    grid-template-rows: auto auto;
+  }
+
+  .pgrid-bento--more .pcard--booking {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .pgrid-bento--more .pcard-stack--two {
+    grid-column: 2 / span 2;
+    grid-row: 2;
+  }
+}
+
+.pcard--booking {
+  align-items: stretch;
+}
+
+.pcard--booking .pcard__copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pcard__tags {
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.pcard__hero-win {
+  align-self: center;
+}
+
+.pcard__hero-win img {
+  height: 232px;
+  object-position: top left;
+}
+
+.pcard__shot-win {
+  margin-top: auto;
+}
+
+.pcard--shot .bento-card__desc {
+  margin-bottom: 12px;
+}
+
+.pcard__shot-win img {
+  height: 118px;
+  object-position: top left;
+}
+
+.pcard-stack.pcard-stack--two {
+  grid-template-rows: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 680px) {
+  .pcard-stack.pcard-stack--two {
+    grid-template-columns: 1fr;
+  }
+
+  .pcard__hero-win img {
+    height: 180px;
+  }
+
+  .pgrid-more__count {
+    display: none;
+  }
 }
 
 /* --------------------------------------------------------------------------

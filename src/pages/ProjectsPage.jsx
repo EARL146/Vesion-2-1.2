@@ -10,7 +10,11 @@ import {
   siPhp,
   siReact,
   siVite,
-  siHtml5
+  siHtml5,
+  siJavascript,
+  siCss,
+  siPython,
+  siDocker
 } from 'simple-icons';
 import { useRouter } from '../lib/router';
 import { ArrowUpRightIcon, BrandIcon } from '../components/Icons';
@@ -18,6 +22,7 @@ import { ArrowUpRightIcon, BrandIcon } from '../components/Icons';
 const FILTERS = [
   { key: 'all', label: 'All' },
   { key: 'web', label: 'Web' },
+  { key: 'systems', label: 'Systems' },
   { key: 'java', label: 'Java' },
   { key: 'mobile', label: 'Mobile' },
   { key: 'lab', label: 'Lab' }
@@ -58,6 +63,7 @@ export default function ProjectsPage({ onOpenProject }) {
           <span>CLICK A CARD TO OPEN IT</span>
         </span>
 
+        <div className="pgrid__scroll">
         <div className="pgrid-bento" data-filter={filter}>
           {/* Top-Left Wide Card: Full-Stack Web */}
           <button
@@ -255,6 +261,123 @@ export default function ProjectsPage({ onOpenProject }) {
               <img src="./projects/burgerbites.png" alt="" />
             </div>
           </button>
+        </div>
+
+        {/* ---------- Second screen: business systems & code archive ---------- */}
+        <div className="pgrid-more" data-filter={filter}>
+          <div className="pgrid-more__head" data-cat="web systems lab">
+            <span className="pgrid-more__eyebrow">BUSINESS SYSTEMS &amp; CODE ARCHIVE</span>
+            <span className="pgrid-more__rule" aria-hidden="true" />
+            <span className="pgrid-more__count">5 more on GitHub</span>
+          </div>
+
+          <div className="pgrid-bento pgrid-bento--more" data-filter={filter}>
+            {/* Wide: Daylight appointment booking */}
+            <button
+              type="button"
+              className="bento-card pcard pcard--wide pcard--booking"
+              data-cat="web systems"
+              onClick={() => onOpenProject('daylight-booking')}
+            >
+              <div className="pcard__copy">
+                <div className="bento__logos">
+                  <span className="bento__logo"><BrandIcon item={siReact} size={20} /></span>
+                  <span className="bento__logo"><BrandIcon item={siVite} size={20} /></span>
+                  <span className="bento__logo"><BrandIcon item={siJavascript} size={20} /></span>
+                </div>
+                <h3 className="bento-card__title">Daylight Booking</h3>
+                <p className="bento-card__desc">
+                  Appointment &amp; scheduling system: week calendar, customers and business hours, built in React.
+                </p>
+                <div className="bento__doc-flow pcard__tags">
+                  <i className="is-on">Calendar</i>
+                  <i>Customers</i>
+                  <i>Availability</i>
+                </div>
+              </div>
+
+              <div className="bento-win pcard__hero-win">
+                <div className="bento-win__bar"><i /><i /><i /></div>
+                <img src="./projects/appointment.jpg" alt="Daylight appointment booking dashboard" />
+              </div>
+            </button>
+
+            {/* Square: Northstar CRM */}
+            <button
+              type="button"
+              className="bento-card pcard pcard--shot"
+              data-cat="web systems"
+              onClick={() => onOpenProject('northstar-crm')}
+            >
+              <div className="bento__logos">
+                <span className="bento__logo"><BrandIcon item={siJavascript} size={19} /></span>
+                <span className="bento__logo"><BrandIcon item={siVite} size={19} /></span>
+              </div>
+              <h3 className="bento-card__title">Northstar CRM</h3>
+              <p className="bento-card__desc">Customers, leads, deals &amp; reports with CSV export.</p>
+              <div className="bento-win pcard__shot-win">
+                <div className="bento-win__bar"><i /><i /><i /></div>
+                <img src="./projects/crm.jpg" alt="Northstar CRM dashboard" />
+              </div>
+            </button>
+
+            {/* Square: Goodswell Commerce */}
+            <button
+              type="button"
+              className="bento-card pcard pcard--shot"
+              data-cat="web systems"
+              onClick={() => onOpenProject('goodswell-commerce')}
+            >
+              <div className="bento__logos">
+                <span className="bento__logo"><BrandIcon item={siJavascript} size={19} /></span>
+                <span className="bento__logo"><BrandIcon item={siCss} size={19} /></span>
+              </div>
+              <h3 className="bento-card__title">Goodswell Commerce</h3>
+              <p className="bento-card__desc">Storefront, cart, orders &amp; admin product catalog.</p>
+              <div className="bento-win pcard__shot-win">
+                <div className="bento-win__bar"><i /><i /><i /></div>
+                <img src="./projects/commerce.jpg" alt="Goodswell Commerce admin dashboard" />
+              </div>
+            </button>
+
+            {/* Stack: CoreStack archive + Calc */}
+            <div className="pcard-stack pcard-stack--two">
+              <button
+                type="button"
+                className="bento-card pcard-mini"
+                data-cat="lab"
+                onClick={() => onOpenProject('corestack')}
+              >
+                <span className="bento__logo"><BrandIcon item={siDocker} size={19} /></span>
+                <span className="pcard-mini__copy">
+                  <span className="pcard-mini__kicker">JS · PYTHON · SQL · DART</span>
+                  <strong>CoreStack</strong>
+                  <small>Practice code archive</small>
+                </span>
+                <span className="pcard-mini__go" aria-hidden="true">
+                  <ArrowUpRightIcon size={14} />
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className="bento-card pcard-mini"
+                data-cat="web lab"
+                onClick={() => onOpenProject('calculator')}
+              >
+                <span className="bento__logo"><BrandIcon item={siPython} size={19} /></span>
+                <span className="pcard-mini__copy">
+                  <span className="pcard-mini__kicker">JS · PYTHON</span>
+                  <strong>Calc</strong>
+                  <small>Web &amp; Python calculators</small>
+                </span>
+                <span className="pcard-mini__go" aria-hidden="true">
+                  <ArrowUpRightIcon size={14} />
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
     </section>

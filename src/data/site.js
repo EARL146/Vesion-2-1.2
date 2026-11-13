@@ -23,10 +23,15 @@ import {
   siTypescript,
   siVite,
   siThreedotjs,
-  siDotnet
+  siDotnet,
+  siPython,
+  siDocker,
+  siPostgresql
 } from 'simple-icons';
 
 export const JAVA_LOGO = './tech-logos/java.svg';
+export const VSCODE_LOGO = './tech-logos/vscode.svg';
+export const OMNIROUTE_LOGO = './tech-logos/omniroute.svg';
 
 export const PROFILE = {
   name: 'Earl Willan Pajo',
@@ -72,7 +77,9 @@ export const TOOLS = [
   { name: 'MySQL', icon: siMysql },
   { name: 'Flutter', icon: siFlutter },
   { name: 'React', icon: siReact },
-  { name: 'GitHub', icon: siGithub, mono: true }
+  { name: 'GitHub', icon: siGithub, mono: true },
+  { name: 'VS Code', src: VSCODE_LOGO },
+  { name: 'OmniRoute', src: OMNIROUTE_LOGO }
 ];
 
 export const STACK_ROWS = [
@@ -203,6 +210,100 @@ export const PROJECTS = [
       'Original portfolio version with interactive SVG graphics.',
       'Built with browser-native web technologies.',
       'Hosted on GitHub Pages.'
+    ],
+    layout: 'square'
+  },
+  {
+    id: 'daylight-booking',
+    title: 'Daylight Booking',
+    subtitle: 'Appointment & scheduling system',
+    category: 'Business System',
+    image: './projects/appointment.jpg',
+    imageAlt: 'Daylight appointment booking dashboard with weekly calendar and today\'s appointments',
+    github: 'https://github.com/EARL146/Appointment-Booking-',
+    tech: ['React', 'Vite', 'JavaScript', 'CSS'],
+    icons: [siReact, siVite, siJavascript],
+    summary: 'A React and Vite appointment booking workspace for managing a studio calendar, customers, and business hours.',
+    bullets: [
+      'Overview dashboard with daily stats, a week/day calendar, and today\'s appointment list.',
+      'Appointments table with search and status filters, plus customer records.',
+      'Availability settings for weekly business hours, appointment length, and buffer time.',
+      'Data is saved in browser localStorage; source code is on GitHub.'
+    ],
+    layout: 'wide'
+  },
+  {
+    id: 'northstar-crm',
+    title: 'Northstar CRM',
+    subtitle: 'Customer relationship management',
+    category: 'Business System',
+    image: './projects/crm.jpg',
+    imageAlt: 'Northstar CRM overview dashboard with revenue chart and sales pipeline',
+    github: 'https://github.com/EARL146/CRM-',
+    tech: ['JavaScript', 'Vite', 'HTML5', 'CSS3'],
+    icons: [siJavascript, siVite, siHtml5],
+    summary: 'A responsive CRM workspace for tracking customer records, leads, sales deals, and performance reports.',
+    bullets: [
+      'Overview dashboard with customer and sales metrics, revenue chart, and pipeline stages.',
+      'Customers, leads, and sales deals with search, create, edit, delete, and CSV export.',
+      'Reports for revenue trends, lead sources, pipeline totals, and top customers.',
+      'Runs in the browser with localStorage persistence (no shared database yet).'
+    ],
+    layout: 'square'
+  },
+  {
+    id: 'goodswell-commerce',
+    title: 'Goodswell Commerce',
+    subtitle: 'E-commerce storefront & admin',
+    category: 'Business System',
+    image: './projects/commerce.jpg',
+    imageAlt: 'Goodswell Commerce admin overview with sales chart and recent orders',
+    github: 'https://github.com/EARL146/Commerce',
+    tech: ['JavaScript', 'Vite', 'HTML5', 'CSS3'],
+    icons: [siJavascript, siVite, siCss],
+    summary: 'A self-contained e-commerce storefront and admin workspace with products, orders, and payments.',
+    bullets: [
+      'Storefront catalog with category filters, search, and a stock-aware shopping cart.',
+      'Order management with status updates and CSV export.',
+      'Admin product catalog with add, edit, delete, and inventory filters.',
+      'Demo checkout only: no real payment provider is connected; data lives in localStorage.'
+    ],
+    layout: 'square'
+  },
+  {
+    id: 'corestack',
+    title: 'CoreStack Monorepo',
+    subtitle: 'Full-stack practice archive',
+    category: 'Code Archive',
+    image: './projects/corestack.jpg',
+    imageAlt: 'CoreStack admin dashboard page from the monorepo',
+    github: 'https://github.com/EARL146/corestack-monorepo',
+    tech: ['JavaScript', 'Python', 'SQL', 'Dart', 'Docker'],
+    icons: [siJavascript, siPython, siPostgresql, siDocker],
+    summary: 'A monorepo that collects my practice code across web, backend, databases, algorithms, mobile, and deployment config.',
+    bullets: [
+      'Algorithms in Python and JavaScript: sorting, BST, dynamic programming, and graph traversal.',
+      'Node.js backend service files (routes, auth middleware, error handling) and SQL schemas.',
+      'Flutter/Dart mobile screens plus Dockerfile, docker-compose, and nginx config.',
+      'Organized as a learning archive; source is on GitHub.'
+    ],
+    layout: 'wide'
+  },
+  {
+    id: 'calculator',
+    title: 'Calc',
+    subtitle: 'Web & Python calculators',
+    category: 'Mini Project',
+    image: './projects/calculator.jpg',
+    imageAlt: 'Dark themed web calculator interface',
+    github: 'https://github.com/EARL146/calculator-dv',
+    tech: ['HTML5', 'CSS3', 'JavaScript', 'Python'],
+    icons: [siHtml5, siJavascript, siPython],
+    summary: 'A dark-themed browser calculator built with HTML, CSS, and JavaScript, with a separate Python version.',
+    bullets: [
+      'Clear, delete, percent, sign toggle, and decimal support.',
+      'Web version: github.com/EARL146/calculator-dv.',
+      'Python version: github.com/EARL146/calculator-py.'
     ],
     layout: 'square'
   }
