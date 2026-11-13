@@ -5059,3 +5059,512 @@
   align-items: flex-start;
   gap: 12px;
 }
+
+/* ==========================================================================
+   OMNIROUTE-INSPIRED CONNECTION INTRO (earlnis.dev opening handshake)
+   ========================================================================== */
+
+.cintro {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px 16px;
+  background-color: var(--cream);
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(var(--accent-rgb), 0.14), transparent 64%),
+    radial-gradient(var(--line) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px;
+  overflow: hidden;
+  transition:
+    opacity 0.32s var(--ease-out),
+    transform 0.32s var(--ease-out),
+    filter 0.32s var(--ease-out);
+  transition-duration: 0.32s !important;
+}
+
+.cintro.is-exiting {
+  opacity: 0;
+  transform: scale(1.02);
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.cintro__glow {
+  position: absolute;
+  width: min(520px, 88vw);
+  height: min(520px, 88vw);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.16), transparent 70%);
+  pointer-events: none;
+  transition: background 0.4s ease;
+}
+
+.cintro.is-connected .cintro__glow {
+  background: radial-gradient(circle, rgba(46, 158, 107, 0.18), transparent 70%);
+}
+
+/* Top typed address bar: https://earlnis.dev + Routing/Connected state */
+.cintro__bar {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 10px 8px 16px;
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 18px 40px -22px rgba(6, 12, 26, 0.36);
+  max-width: calc(100vw - 32px);
+}
+
+.cintro__proto {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.cintro__domain {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  min-width: 98px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cintro__cursor {
+  display: inline-block;
+  width: 2px;
+  height: 15px;
+  margin-left: 2px;
+  background: var(--accent);
+  animation: cintro-blink 0.65s steps(2, start) infinite;
+}
+
+.cintro__state {
+  margin-left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(var(--accent-rgb), 0.1);
+  color: var(--accent-ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  transition-duration: 0.24s !important;
+}
+
+.cintro__state.is-online {
+  background: rgba(46, 158, 107, 0.15);
+  color: #1F7A51;
+}
+
+[data-theme='dark'] .cintro__state.is-online {
+  color: #5CE0A1;
+}
+
+.cintro__state-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: cintro-dot-pulse 1s ease-in-out infinite;
+}
+
+/* Topology Coordinate Stage */
+.cintro__stage {
+  position: relative;
+  z-index: 2;
+  width: min(760px, 92vw, calc(66dvh * 800 / 440));
+  flex-shrink: 0;
+}
+
+.cintro__stage.is-mobile {
+  width: min(352px, 92vw, calc(66dvh * 360 / 440));
+}
+
+.cintro__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.cintro__track {
+  stroke: var(--line);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.cintro__wire {
+  stroke: var(--accent);
+  stroke-width: 2.3;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: cintro-draw 0.34s var(--ease-out) var(--wire-delay, 0ms) forwards;
+  animation-duration: 0.34s !important;
+  animation-iteration-count: 1 !important;
+  transition: stroke 0.28s ease !important;
+}
+
+.cintro__wire.is-linked {
+  stroke: rgba(46, 158, 107, 0.42);
+}
+
+.cintro__pulse {
+  stroke: #2E9E6B;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 6 12;
+  animation: cintro-flow 0.65s linear infinite;
+  animation-duration: 0.65s !important;
+  animation-iteration-count: infinite !important;
+}
+
+/* Peripheral Stack Nodes */
+.cintro__node {
+  position: absolute;
+  transform: translate(-50%, -50%) scale(0.94);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: var(--paper);
+  border: 1.5px solid var(--line-strong);
+  box-shadow: 0 12px 28px -18px rgba(6, 12, 26, 0.32);
+  white-space: nowrap;
+  pointer-events: none;
+  transition:
+    transform 0.32s var(--ease-spring),
+    border-color 0.26s ease,
+    box-shadow 0.26s ease;
+  transition-duration: 0.3s !important;
+}
+
+.cintro__node.is-linked {
+  transform: translate(-50%, -50%) scale(1);
+  border-color: rgba(46, 158, 107, 0.65);
+  box-shadow:
+    0 0 0 3px rgba(46, 158, 107, 0.12),
+    0 16px 32px -18px rgba(6, 12, 26, 0.32);
+}
+
+.cintro__node-ico {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--tint);
+  color: var(--navy);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 0.24s ease;
+}
+
+[data-theme='dark'] .cintro__node-ico {
+  background: var(--brands-chip-bg);
+  color: #0B1E3F;
+}
+
+.cintro__node-copy {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  min-width: 0;
+  opacity: 0.52;
+  transition: opacity 0.24s ease;
+}
+
+.cintro__node.is-linked .cintro__node-ico,
+.cintro__node.is-linked .cintro__node-copy {
+  opacity: 1;
+}
+
+.cintro__node-copy strong {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--navy);
+}
+
+.cintro__node-copy small {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  line-height: 1.2;
+  color: var(--muted);
+}
+
+.cintro__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line-strong);
+  flex-shrink: 0;
+  transition: background-color 0.24s ease, box-shadow 0.24s ease;
+}
+
+.cintro__node.is-linked .cintro__dot {
+  background: #2E9E6B;
+  box-shadow: 0 0 0 3px rgba(46, 158, 107, 0.24);
+}
+
+/* Central earlnis.dev Router Hub */
+.cintro__hub {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 15px;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 2px solid var(--accent);
+  box-shadow:
+    0 0 0 6px rgba(var(--accent-rgb), 0.12),
+    0 24px 48px -18px rgba(var(--accent-rgb), 0.45);
+  white-space: nowrap;
+  animation: cintro-hub-in 0.36s var(--ease-spring) both;
+  transition: border-color 0.28s ease, box-shadow 0.28s ease;
+  transition-duration: 0.26s !important;
+}
+
+.cintro__hub.is-online {
+  border-color: #2E9E6B;
+  box-shadow:
+    0 0 0 7px rgba(46, 158, 107, 0.16),
+    0 24px 52px -18px rgba(46, 158, 107, 0.42);
+}
+
+.cintro__hub-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 22px;
+  border: 1.5px solid rgba(var(--accent-rgb), 0.45);
+  pointer-events: none;
+  animation: cintro-ring 1.5s var(--ease-out) infinite;
+}
+
+.cintro__hub.is-online .cintro__hub-ring {
+  border-color: rgba(46, 158, 107, 0.5);
+}
+
+.cintro__hub-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(var(--accent-rgb), 0.14);
+  color: var(--accent-ink);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: background-color 0.28s ease, color 0.28s ease;
+  transition-duration: 0.26s !important;
+}
+
+.cintro__hub.is-online .cintro__hub-mark {
+  background: rgba(46, 158, 107, 0.16);
+  color: #2E9E6B;
+}
+
+.cintro__hub-copy {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.cintro__hub-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cintro__hub-title strong {
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--navy);
+  line-height: 1.15;
+}
+
+.cintro__hub-copy small {
+  font-size: 10.5px;
+  color: var(--muted);
+  line-height: 1.25;
+}
+
+.cintro__hub-count {
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.2;
+  transition: background-color 0.28s ease;
+  transition-duration: 0.26s !important;
+}
+
+.cintro__hub.is-online .cintro__hub-count {
+  background: #2E9E6B;
+}
+
+.cintro__skip {
+  position: relative;
+  z-index: 2;
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  transition: color var(--dur-fast) ease, border-color var(--dur-fast) ease, transform var(--dur-fast) ease;
+}
+
+.cintro__skip:hover {
+  color: var(--navy);
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 639px) {
+  .cintro {
+    gap: 14px;
+    padding: 16px 12px;
+  }
+
+  .cintro__bar {
+    padding: 6px 8px 6px 12px;
+  }
+
+  .cintro__proto,
+  .cintro__domain {
+    font-size: 12.5px;
+  }
+
+  .cintro__domain {
+    min-width: 86px;
+  }
+
+  .cintro__state {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  .cintro__node {
+    gap: 6px;
+    padding: 6px 9px;
+    border-radius: 12px;
+  }
+
+  .cintro__node-ico {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+  }
+
+  .cintro__node-copy strong {
+    font-size: 10.5px;
+  }
+
+  .cintro__node-copy small {
+    font-size: 8.5px;
+  }
+
+  .cintro__dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .cintro__hub {
+    gap: 9px;
+    padding: 10px 13px;
+    border-radius: 15px;
+  }
+
+  .cintro__hub-mark {
+    width: 30px;
+    height: 30px;
+  }
+
+  .cintro__hub-title strong {
+    font-size: 13.5px;
+  }
+
+  .cintro__hub-copy small {
+    font-size: 9.5px;
+  }
+}
+
+@keyframes cintro-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes cintro-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
+@keyframes cintro-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes cintro-dot-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.28);
+    opacity: 0.72;
+  }
+}
+
+@keyframes cintro-hub-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes cintro-ring {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.16);
+  }
+}

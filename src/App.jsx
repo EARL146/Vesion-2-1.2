@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, Link } from './lib/router';
 import HeroCanvas from './components/HeroCanvas';
 import LeftRail from './components/LeftRail';
+import ConnectionIntro from './components/ConnectionIntro';
 import AccessibilityMenu from './components/AccessibilityMenu';
 import ChatBuddy from './components/ChatBuddy';
 import ProjectModal from './components/ProjectModal';
@@ -26,6 +27,7 @@ export default function App() {
   const [activeProjectId, setActiveProjectId] = useState(null);
   const [activeCertIndex, setActiveCertIndex] = useState(null);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
     const handleOpenResume = () => setIsResumeOpen(true);
@@ -113,8 +115,9 @@ export default function App() {
   };
 
   return (
-    <div className="shell">
-      <HeroCanvas />
+    <>
+      <div className="shell">
+        <HeroCanvas />
 
       <a className="skip-link" href="#shell-panel">
         Skip to main content
@@ -151,6 +154,9 @@ export default function App() {
         isOpen={isResumeOpen}
         onClose={() => setIsResumeOpen(false)}
       />
-    </div>
+      </div>
+
+      {showIntro && <ConnectionIntro onDone={() => setShowIntro(false)} />}
+    </>
   );
 }
