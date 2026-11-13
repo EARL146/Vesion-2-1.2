@@ -36,11 +36,16 @@ export default function HomePage({ onOpenResume, onOpenProject }) {
 
           <div className="tools-bar" role="list" aria-label="Daily tools and languages">
             {TOOLS.map((tool) => (
-              <div key={tool.name} className="tools-bar__item" role="listitem">
+              <div
+                key={tool.name}
+                className="tools-bar__item"
+                role="listitem"
+                aria-label={tool.name}
+                title={tool.name}
+              >
                 <span className="tools-bar__tile">
-                  <BrandIcon item={tool} size={20} />
+                  <BrandIcon item={tool} size={22} />
                 </span>
-                <span className="tools-bar__name">{tool.name}</span>
               </div>
             ))}
           </div>
