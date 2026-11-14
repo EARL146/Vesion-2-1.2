@@ -1,22 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { PROJECTS, TOOLS } from '../data/site';
+import { TOOLS } from '../data/site';
 import { useTheme } from '../lib/theme';
 import { BrandIcon, VerifiedBadge } from './Icons';
 
 const INTRO_NODES = [
-  { id: 'java', title: 'Java 21 · Spring', tag: 'Backend', tool: TOOLS[0], delay: 220 },
-  { id: 'react', title: 'React · Vite', tag: 'Frontend', tool: TOOLS[6], delay: 300 },
-  { id: 'node', title: 'Node · Express', tag: 'REST APIs', tool: TOOLS[2], delay: 380 },
-  { id: 'mysql', title: 'MySQL · Schema', tag: 'Database', tool: TOOLS[4], delay: 460 },
-  { id: 'flutter', title: 'Flutter · Dart', tag: 'Mobile', tool: TOOLS[5], delay: 540 },
-  {
-    id: 'github',
-    title: 'GitHub · Source',
-    tag: `${PROJECTS.length} Repos`,
-    tool: TOOLS[7],
-    delay: 620
-  }
+  { id: 'java', title: 'Java 21 · Spring', tool: TOOLS[0] },
+  { id: 'react', title: 'React · Vite', tool: TOOLS[6] },
+  { id: 'node', title: 'Node · Express', tool: TOOLS[2] },
+  { id: 'mysql', title: 'MySQL · Schema', tool: TOOLS[4] },
+  { id: 'flutter', title: 'Flutter · Dart', tool: TOOLS[5] },
+  { id: 'github', title: 'GitHub · Source', tool: TOOLS[7] }
 ];
+
+const LOAD_DURATION_MS = 6800;
+const HOLD_CONNECTED_MS = 1600;
+const EXIT_DURATION_MS = 600;
 
 /* Desktop (800×440): flanking wings mirroring an edge-to-hub topology */
 const DESKTOP_LAYOUT = {
@@ -24,12 +22,12 @@ const DESKTOP_LAYOUT = {
   vh: 440,
   hub: { x: 400, y: 220 },
   points: [
-    { x: 148, y: 78 },
-    { x: 652, y: 78 },
-    { x: 108, y: 220 },
-    { x: 692, y: 220 },
-    { x: 148, y: 362 },
-    { x: 652, y: 362 }
+    { x: 166, y: 78 },
+    { x: 634, y: 78 },
+    { x: 134, y: 220 },
+    { x: 666, y: 220 },
+    { x: 166, y: 362 },
+    { x: 634, y: 362 }
   ]
 };
 
@@ -41,8 +39,8 @@ const MOBILE_LAYOUT = {
   points: [
     { x: 88, y: 126 },
     { x: 272, y: 126 },
-    { x: 180, y: 46 },
-    { x: 180, y: 394 },
+    { x: 180, y: 48 },
+    { x: 180, y: 392 },
     { x: 88, y: 314 },
     { x: 272, y: 314 }
   ]
@@ -66,8 +64,10 @@ function buildCurvePath(pt, hub, isMobile) {
 export default function ConnectionIntro({ onDone }) {
   const { reduceMotion } = useTheme();
   const [phase, setPhase] = useState('routing');
+  const [armed, setArmed] = useState(false);
   const [linkedIds, setLinkedIds] = useState([]);
   const [typedChars, setTypedChars] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth < 640 : false
   );
@@ -80,7 +80,7 @@ export default function ConnectionIntro({ onDone }) {
     setPhase('exiting');
     window.setTimeout(() => {
       onDone?.();
-    }, 320);
+    }, EXIT_DURATION_MS);
   }, [onDone]);
 
   useEffect(() => {
@@ -95,24 +95,43 @@ export default function ConnectionIntro({ onDone }) {
     mq.addEventListener('change', onMq);
 
     const timers = [];
+    const startAt = performance.now();
+    let lastPct = -1;
+    setArmed(true);
 
-    // Typewriter sweep on earlnis.dev in the top address bar
+    // Slow-motion typewriter sweep on earlnis.dev in the top address bar
     for (let i = 1; i <= domain.length; i += 1) {
-      timers.push(window.setTimeout(() => setTypedChars(i), 45 + i * 32));
+      timers.push(window.setTimeout(() => setTypedChars(i), 180 + i * 120));
     }
 
-    // Stagger each peripheral stack node locking onto the hub
-    INTRO_NODES.forEach((node) => {
-      timers.push(
-        window.setTimeout(() => {
-          setLinkedIds((prev) => (prev.includes(node.id) ? prev : [...prev, node.id]));
-        }, node.delay + 280)
-      );
-    });
+    // Throttled slow-motion progress counter (~75ms ticks) synchronized with ~6.8s wire trace
+    const progressTimer = window.setInterval(() => {
+      const t = Math.min(1, (performance.now() - startAt) / LOAD_DURATION_MS);
+      const eased = 1 - Math.pow(1 - t, 1.35);
+      const pct = Math.min(99, Math.round(eased * 100));
+      if (pct !== lastPct) {
+        lastPct = pct;
+        setProgress(pct);
+      }
+      if (t >= 1) {
+        window.clearInterval(progressTimer);
+      }
+    }, 75);
 
-    // Mark connection healthy, hold briefly so visitor sees all 6 green routes + hub lock, then reveal shell
-    timers.push(window.setTimeout(() => setPhase('connected'), 1000));
-    timers.push(window.setTimeout(() => dismiss(), 1620));
+    // Connect all 6 peripheral stack nodes simultaneously in unison ("sabay-sabay")
+    timers.push(
+      window.setTimeout(() => {
+        window.clearInterval(progressTimer);
+        setProgress(100);
+        setLinkedIds(INTRO_NODES.map((n) => n.id));
+        setPhase('connected');
+      }, LOAD_DURATION_MS)
+    );
+
+    // Hold healthy all-connected state briefly, then smoothly dissolve into portfolio (~9s total)
+    timers.push(
+      window.setTimeout(() => dismiss(), LOAD_DURATION_MS + HOLD_CONNECTED_MS)
+    );
 
     const onKey = (e) => {
       if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
@@ -123,6 +142,7 @@ export default function ConnectionIntro({ onDone }) {
     window.addEventListener('keydown', onKey);
 
     return () => {
+      window.clearInterval(progressTimer);
       timers.forEach((id) => window.clearTimeout(id));
       mq.removeEventListener('change', onMq);
       window.removeEventListener('keydown', onKey);
@@ -148,7 +168,7 @@ export default function ConnectionIntro({ onDone }) {
 
   return (
     <div
-      className={`cintro ${isConnected ? 'is-connected' : ''} ${phase === 'exiting' ? 'is-exiting' : ''}`}
+      className={`cintro ${armed ? 'is-armed' : ''} ${isConnected ? 'is-connected' : ''} ${phase === 'exiting' ? 'is-exiting' : ''}`}
       role="region"
       aria-label="Connecting to earlnis.dev portfolio"
       onClick={dismiss}
@@ -164,8 +184,9 @@ export default function ConnectionIntro({ onDone }) {
         </strong>
         <span className={`cintro__state ${isConnected ? 'is-online' : ''}`}>
           <i className="cintro__state-dot" aria-hidden="true" />
-          <span>{isConnected ? 'Connected' : `Routing ${linkedCount}/${INTRO_NODES.length}`}</span>
+          <span>{isConnected ? 'Connected' : `Loading ${progress}%`}</span>
         </span>
+        <span className="cintro__progress" style={{ width: `${progress}%` }} aria-hidden="true" />
       </div>
 
       {/* OmniRoute-style hub-and-spoke topology canvas */}
@@ -185,14 +206,13 @@ export default function ConnectionIntro({ onDone }) {
               <g key={edge.id}>
                 {/* Passive track guide */}
                 <path d={edge.d} className="cintro__track" />
-                {/* Animated route draw-in + live dashed flow */}
+                {/* Slow-motion animated route draw-in */}
                 <path
                   d={edge.d}
                   pathLength="1"
                   className={`cintro__wire ${isLinked ? 'is-linked' : ''}`}
-                  style={{ '--wire-delay': `${edge.delay}ms` }}
                 />
-                {/* Flowing packet pulse once route connects */}
+                {/* Slow-motion flowing packet pulse once all routes connect */}
                 {isLinked && (
                   <path d={edge.d} className="cintro__pulse" />
                 )}
@@ -201,25 +221,22 @@ export default function ConnectionIntro({ onDone }) {
           })}
         </svg>
 
-        {/* Peripheral connected nodes */}
+        {/* Peripheral connected nodes (logo-only badges) */}
         {edges.map((edge) => {
           const isLinked = linkedIds.includes(edge.id);
           return (
             <div
               key={edge.id}
               className={`cintro__node ${isLinked ? 'is-linked' : ''} ${isConnected ? 'is-ready' : ''}`}
+              aria-label={edge.title}
+              title={edge.title}
               style={{
                 left: `${(edge.pt.x / layout.vw) * 100}%`,
-                top: `${(edge.pt.y / layout.vh) * 100}%`,
-                '--node-delay': `${edge.delay}ms`
+                top: `${(edge.pt.y / layout.vh) * 100}%`
               }}
             >
               <span className="cintro__node-ico">
-                <BrandIcon item={edge.tool} size={15} />
-              </span>
-              <span className="cintro__node-copy">
-                <strong>{edge.title}</strong>
-                <small>{edge.tag}</small>
+                <BrandIcon item={edge.tool} size={isMobile ? 20 : 24} />
               </span>
               <span className="cintro__dot" aria-hidden="true" />
             </div>
