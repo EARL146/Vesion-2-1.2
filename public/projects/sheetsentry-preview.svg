@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="t d">
+  <title id="t">SheetSentry spreadsheet validation preview</title>
+  <desc id="d">Illustrated validation report concept with row-level errors, a formula injection shield and export options.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#052e2b"/><stop offset="1" stop-color="#0f766e"/></linearGradient>
+    <linearGradient id="ac" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#14b8a6"/><stop offset="1" stop-color="#5eead4"/></linearGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#021a18" flood-opacity=".25"/></filter>
+  </defs>
+  <rect width="1200" height="760" rx="32" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="704" rx="24" fill="#f3faf9"/>
+  <rect x="28" y="28" width="1144" height="84" rx="24" fill="#fff"/>
+  <path d="M28 88h1144v24H28z" fill="#fff"/>
+  <rect x="54" y="48" width="44" height="44" rx="13" fill="url(#ac)"/>
+  <path d="M62 70h28M62 78h28M62 86h18 M76 62v32" stroke="#042f2c" stroke-width="3" stroke-linecap="round"/>
+  <text x="112" y="78" fill="#042f2c" font-family="Arial,sans-serif" font-size="24" font-weight="700">SheetSentry</text>
+  <g font-family="Arial,sans-serif" font-size="14" font-weight="600" fill="#0f766e">
+    <text x="640" y="76">Validate</text><text x="740" y="76">Profiles</text><text x="838" y="76">Exports</text>
+    <rect x="950" y="50" width="196" height="40" rx="20" fill="url(#ac)"/><text x="988" y="76" fill="#042f2c" font-weight="700">Upload .csv / .xlsx</text>
+  </g>
+  <text x="62" y="170" fill="#042f2c" font-family="Arial,sans-serif" font-size="28" font-weight="700">Validation report</text>
+  <text x="62" y="198" fill="#4f7a76" font-family="Arial,sans-serif" font-size="15">customers_q4.xlsx · rules: Customer intake v3</text>
+  <g filter="url(#sh)">
+    <rect x="62" y="226" width="216" height="104" rx="18" fill="#fff"/>
+    <rect x="294" y="226" width="216" height="104" rx="18" fill="#fff"/>
+    <rect x="526" y="226" width="216" height="104" rx="18" fill="#fff"/>
+    <rect x="62" y="352" width="680" height="344" rx="20" fill="#fff"/>
+    <rect x="768" y="226" width="370" height="230" rx="20" fill="#fff"/>
+    <rect x="768" y="476" width="370" height="220" rx="20" fill="#fff"/>
+  </g>
+  <g font-family="Arial,sans-serif">
+    <text x="84" y="264" fill="#4f7a76" font-size="13" font-weight="700">ROWS CHECKED</text><text x="84" y="308" fill="#042f2c" font-size="34" font-weight="700">12,480</text>
+    <text x="316" y="264" fill="#4f7a76" font-size="13" font-weight="700">ROW ERRORS</text><text x="316" y="308" fill="#b3363a" font-size="34" font-weight="700">37</text>
+    <text x="548" y="264" fill="#4f7a76" font-size="13" font-weight="700">FORMULAS NEUTRALIZED</text><text x="548" y="308" fill="#0f766e" font-size="34" font-weight="700">5</text>
+  </g>
+  <text x="86" y="394" fill="#042f2c" font-family="Arial,sans-serif" font-size="18" font-weight="700">Issues &amp; fixes</text>
+  <g font-family="Arial,sans-serif" font-size="13" fill="#4f7a76" font-weight="700"><text x="86" y="430">ROW</text><text x="156" y="430">COLUMN</text><text x="290" y="430">ISSUE</text><text x="540" y="430">SEVERITY</text></g>
+  <path d="M86 442h632" stroke="#e1efed"/>
+  <g font-family="Arial,sans-serif" font-size="14" fill="#13403c">
+    <text x="86" y="476">14</text><text x="156" y="476">email</text><text x="290" y="476">Invalid email format</text><rect x="540" y="458" width="76" height="26" rx="13" fill="#fde7e7"/><text x="558" y="476" fill="#b3363a" font-weight="700">ERROR</text>
+    <text x="86" y="522">58</text><text x="156" y="522">phone</text><text x="290" y="522">Country code missing</text><rect x="540" y="504" width="88" height="26" rx="13" fill="#fff0d9"/><text x="556" y="522" fill="#a8661a" font-weight="700">WARNING</text>
+    <text x="86" y="568">103</text><text x="156" y="568">notes</text><text x="290" y="568">Formula prefix “=” removed</text><rect x="540" y="550" width="76" height="26" rx="13" fill="#d9f5f1"/><text x="560" y="568" fill="#0f766e" font-weight="700">FIXED</text>
+    <text x="86" y="614">211</text><text x="156" y="614">plan</text><text x="290" y="614">Value not in allowed list</text><rect x="540" y="596" width="76" height="26" rx="13" fill="#fde7e7"/><text x="558" y="614" fill="#b3363a" font-weight="700">ERROR</text>
+    <text x="86" y="660">342</text><text x="156" y="660">id</text><text x="290" y="660">Duplicate of row 87</text><rect x="540" y="642" width="76" height="26" rx="13" fill="#fde7e7"/><text x="558" y="660" fill="#b3363a" font-weight="700">ERROR</text>
+  </g>
+  <text x="792" y="268" fill="#042f2c" font-family="Arial,sans-serif" font-size="18" font-weight="700">Formula injection shield</text>
+  <g font-family="Arial,sans-serif" font-size="15">
+    <rect x="792" y="288" width="322" height="48" rx="12" fill="#fde7e7"/><text x="810" y="318" fill="#b3363a" font-family="monospace" font-size="16">=HYPERLINK(&quot;http://...&quot;)</text>
+    <text x="810" y="364" fill="#4f7a76" font-size="22">↓</text>
+    <rect x="792" y="378" width="322" height="48" rx="12" fill="#d9f5f1"/><text x="810" y="408" fill="#0f766e" font-family="monospace" font-size="16">'=HYPERLINK(&quot;http://...&quot;)</text>
+  </g>
+  <text x="792" y="518" fill="#042f2c" font-family="Arial,sans-serif" font-size="18" font-weight="700">Export studio</text>
+  <g font-family="Arial,sans-serif" font-size="14" fill="#13403c">
+    <rect x="792" y="540" width="322" height="38" rx="11" fill="#eaf6f4"/><text x="810" y="564">Styled multi-sheet Excel (.xlsx)</text>
+    <rect x="792" y="588" width="322" height="38" rx="11" fill="#eaf6f4"/><text x="810" y="612">Sanitized clean CSV</text>
+    <rect x="792" y="636" width="322" height="38" rx="11" fill="#eaf6f4"/><text x="810" y="660">Error &amp; remediation CSV</text>
+  </g>
+</svg>

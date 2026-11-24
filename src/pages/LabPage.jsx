@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ExternalLink,
   Layers,
@@ -7,16 +8,60 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Sparkles
+  Maximize2,
+  Sparkles,
+  X
 } from 'lucide-react';
 import { PROFILE, PROJECTS, STACK_ROWS } from '../data/site';
 import { ArrowUpRightIcon, BrandIcon, GitHubIcon } from '../components/Icons';
 
+const ProjectReel3D = lazy(() => import('../components/ProjectReel3D'));
+
+function getInitialLabTab() {
+  if (typeof window === 'undefined') return 'overview';
+  const h = window.location.hash.toLowerCase();
+  return h === '#cylinder' || h === '#barrel' ? 'cylinder' : 'overview';
+}
+
 export default function LabPage({ onOpenProject }) {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(getInitialLabTab);
   const [phClock, setPhClock] = useState('');
-  const [reelIndex, setReelIndex] = useState(0);
+  const [currentProject, setCurrentProject] = useState(PROJECTS[5 % PROJECTS.length]);
+  const [reelExpanded, setReelExpanded] = useState(false);
+  const reelControlRef = useRef(null);
+  const modalControlRef = useRef(null);
   const [iframeReady, setIframeReady] = useState(false);
+
+  useEffect(() => {
+    const syncHash = () => {
+      const h = window.location.hash.toLowerCase();
+      if (h === '#cylinder' || h === '#barrel') setActiveTab('cylinder');
+    };
+    const onRouteHash = (e) => {
+      const h = (e.detail?.hash || '').toLowerCase();
+      if (h === '#cylinder' || h === '#barrel') setActiveTab('cylinder');
+    };
+    window.addEventListener('hashchange', syncHash);
+    window.addEventListener('route-hash-change', onRouteHash);
+    return () => {
+      window.removeEventListener('hashchange', syncHash);
+      window.removeEventListener('route-hash-change', onRouteHash);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!reelExpanded) return undefined;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e) => {
+      if (e.key === 'Escape') setReelExpanded(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [reelExpanded]);
 
   useEffect(() => {
     const tick = () => {
@@ -32,8 +77,6 @@ export default function LabPage({ onOpenProject }) {
     const id = setInterval(tick, 15000);
     return () => clearInterval(id);
   }, []);
-
-  const currentProject = PROJECTS[reelIndex];
 
   return (
     <section className="page-view page-lab" aria-label="Dev Lab and Portfolio Evolution">
@@ -243,51 +286,36 @@ export default function LabPage({ onOpenProject }) {
 
               {activeTab === 'cylinder' && (
                 <div className="lab-pane lab-cylinder">
-                  <div className="cylinder-stage">
-                    <div className="cylinder-ring">
-                      {PROJECTS.map((proj, idx) => {
-                        const offset = idx - reelIndex;
-                        const wrapped =
-                          offset > PROJECTS.length / 2
-                            ? offset - PROJECTS.length
-                            : offset < -PROJECTS.length / 2
-                            ? offset + PROJECTS.length
-                            : offset;
-                        const abs = Math.abs(wrapped);
-                        if (abs > 2) return null;
-                        return (
-                          <button
-                            key={proj.id}
-                            type="button"
-                            className={`cylinder-card ${wrapped === 0 ? 'is-center' : ''}`}
-                            style={{
-                              '--slot': wrapped,
-                              zIndex: 10 - abs
-                            }}
-                            onClick={() =>
-                              wrapped === 0 ? onOpenProject(proj.id) : setReelIndex(idx)
-                            }
-                          >
-                            <div className="cylinder-card__img">
-                              <img src={proj.image} alt={proj.title} />
-                            </div>
-                            <div className="cylinder-card__foot">
-                              <strong>{proj.title}</strong>
-                              <span>{proj.category}</span>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
+                  <div className="reel3d-stage-wrap">
+                    {!reelExpanded ? (
+                      <Suspense fallback={<div className="reel3d reel3d--loading" aria-busy="true" />}>
+                        <ProjectReel3D
+                          projects={PROJECTS}
+                          controlRef={reelControlRef}
+                          onOpen={onOpenProject}
+                          onActiveChange={setCurrentProject}
+                        />
+                      </Suspense>
+                    ) : (
+                      <div className="reel3d reel3d--loading" aria-hidden="true" />
+                    )}
+
+                    <button
+                      type="button"
+                      className="reel3d__expand"
+                      onClick={() => setReelExpanded(true)}
+                      aria-label="Open full-view 3D project reel"
+                    >
+                      <Maximize2 size={14} />
+                      <span>Full View</span>
+                    </button>
                   </div>
 
                   <div className="cylinder-controls">
                     <button
                       type="button"
                       className="cylinder-btn"
-                      onClick={() =>
-                        setReelIndex((i) => (i - 1 + PROJECTS.length) % PROJECTS.length)
-                      }
+                      onClick={() => reelControlRef.current?.rotate(1)}
                       aria-label="Previous project"
                     >
                       <ChevronLeft size={18} />
@@ -301,7 +329,7 @@ export default function LabPage({ onOpenProject }) {
                     <button
                       type="button"
                       className="cylinder-btn"
-                      onClick={() => setReelIndex((i) => (i + 1) % PROJECTS.length)}
+                      onClick={() => reelControlRef.current?.rotate(-1)}
                       aria-label="Next project"
                     >
                       <ChevronRight size={18} />
@@ -318,6 +346,84 @@ export default function LabPage({ onOpenProject }) {
                   </div>
                 </div>
               )}
+
+              {reelExpanded &&
+                createPortal(
+                  <div
+                    className="pmodal pmodal--theater"
+                    onClick={() => setReelExpanded(false)}
+                    role="presentation"
+                  >
+                    <div
+                      className="reel3d-theater"
+                      role="dialog"
+                      aria-modal="true"
+                      aria-label="Full-view 3D Project Reel"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        type="button"
+                        className="reel3d-theater__close"
+                        onClick={() => setReelExpanded(false)}
+                        aria-label="Close full-view 3D reel"
+                      >
+                        <X size={20} />
+                      </button>
+
+                      <Suspense fallback={<div className="reel3d reel3d--loading" aria-busy="true" />}>
+                        <ProjectReel3D
+                          projects={PROJECTS}
+                          controlRef={modalControlRef}
+                          captureWheel
+                          expanded
+                          onOpen={(id) => {
+                            setReelExpanded(false);
+                            onOpenProject(id);
+                          }}
+                          onActiveChange={setCurrentProject}
+                        />
+                      </Suspense>
+
+                      <div className="reel3d-theater__bar">
+                        <button
+                          type="button"
+                          className="cylinder-btn"
+                          onClick={() => modalControlRef.current?.rotate(1)}
+                          aria-label="Previous project"
+                        >
+                          <ChevronLeft size={18} />
+                        </button>
+
+                        <div className="cylinder-info">
+                          <strong>{currentProject.title}</strong>
+                          <span>{currentProject.subtitle}</span>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="cylinder-btn"
+                          onClick={() => modalControlRef.current?.rotate(-1)}
+                          aria-label="Next project"
+                        >
+                          <ChevronRight size={18} />
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn-pill btn-pill--primary"
+                          onClick={() => {
+                            setReelExpanded(false);
+                            onOpenProject(currentProject.id);
+                          }}
+                        >
+                          <span>Inspect {currentProject.title}</span>
+                          <ArrowUpRightIcon size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>,
+                  document.body
+                )}
 
               {activeTab === 'v1-live' && (
                 <div className="lab-iframe-wrap">

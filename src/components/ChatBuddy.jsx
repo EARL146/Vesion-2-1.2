@@ -1,91 +1,115 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { X, Send, ArrowUpRight, RotateCcw, Sparkles } from 'lucide-react';
 import { useRouter } from '../lib/router';
-import { PROFILE } from '../data/site';
+import { PROFILE, PROJECTS } from '../data/site';
+
+const PROJECT_COUNT = PROJECTS.length;
 
 const INITIAL_MESSAGE = {
   sender: 'bot',
-  text: 'Hi! I’m EarlBot. Tap a question below or ask me about Earl’s 12 shipped projects, core tech stack, 12 verified certificates, BSIT background, or how to work together.',
+  text: `Hi! I’m EarlBot. Tap a question below or ask me about Earl’s ${PROJECT_COUNT} shipped projects, core tech stack, 12 verified certificates, BSIT background, or how to work together.`,
   meta: 'EarlBot · Online'
 };
 
 const KNOWLEDGE_BASE = [
   {
     triggers: ['what projects', 'shipped', 'all projects', 'projects has earl', 'portfolio projects', 'repositories', 'repos', 'built'],
-    reply: 'Earl has shipped 12 public projects on GitHub across web, business systems, Java, and mobile:',
+    reply: `Earl has shipped ${PROJECT_COUNT} public projects on GitHub across web, enterprise systems, Java, and mobile:`,
     items: [
       {
         num: '01',
+        title: 'IMS Platform',
+        tag: 'Java 21 · Spring Boot 3 · React',
+        desc: 'Inventory ledger, procurement, multi-warehouse transfers, POS & store commerce.',
+        to: '/projects'
+      },
+      {
+        num: '02',
+        title: 'Acadify LMS',
+        tag: 'React 19 · Spring Boot 3.4 · MySQL',
+        desc: 'Multi-tenant LMS with 6 role portals, answer calendar & certificate verifier.',
+        to: '/projects'
+      },
+      {
+        num: '03',
+        title: 'SheetSentry',
+        tag: 'React · TypeScript · Express',
+        desc: 'CSV & .xlsx validation SaaS with formula injection shield & clean exports.',
+        to: '/projects'
+      },
+      {
+        num: '04',
         title: 'MotoFix E-Commerce',
         tag: 'Node.js · MySQL',
         desc: 'Motorcycle parts storefront, cart & order management.',
         to: '/projects'
       },
       {
-        num: '02',
+        num: '05',
         title: 'PharmaCare Portal',
         tag: 'Next.js · TypeScript',
         desc: 'Responsive healthcare web platform & medicine catalog.',
         to: '/projects'
       },
       {
-        num: '03',
+        num: '06',
         title: 'BurgerBites Mobile',
         tag: 'Flutter · PHP/MySQL',
         desc: 'Cross-platform mobile food ordering app + REST API.',
         to: '/projects'
       },
       {
-        num: '04',
-        title: 'HitoHouse Ordering',
-        tag: 'Java · Spring Boot',
-        desc: 'Commercial catfish online ordering web platform.',
-        to: '/projects'
-      },
-      {
-        num: '05',
-        title: 'StreetFood POS',
-        tag: 'Java 21 · Swing',
-        desc: 'Desktop ordering system with custom FlatLaf UI.',
-        to: '/projects'
-      },
-      {
-        num: '06',
-        title: 'BarberGo & Portfolio v1',
-        tag: 'HTML5 · CSS3 · SVG',
-        desc: 'Client barbershop landing page & pure-SVG v1 portfolio.',
-        to: '/projects'
-      },
-      {
         num: '07',
-        title: 'Daylight Booking',
-        tag: 'React · Vite',
-        desc: 'Appointment system with week calendar, customers & business hours.',
+        title: 'HitoHouse & StreetFood',
+        tag: 'Java 21 · Spring Boot · Swing',
+        desc: 'Catfish ordering web app and FlatLaf desktop POS ordering system.',
         to: '/projects'
       },
       {
         num: '08',
-        title: 'Northstar CRM',
-        tag: 'JavaScript · Vite',
-        desc: 'Customers, leads, deals & reports with CSV export.',
+        title: 'Daylight, CRM & Commerce',
+        tag: 'React · Vite · JS',
+        desc: 'Appointment booking, Northstar CRM & Goodswell e-commerce systems.',
         to: '/projects'
       },
       {
         num: '09',
-        title: 'Goodswell Commerce',
-        tag: 'JavaScript · Vite',
-        desc: 'Storefront, cart, orders & admin product catalog (demo checkout).',
-        to: '/projects'
-      },
-      {
-        num: '10',
-        title: 'CoreStack & Calc',
-        tag: 'JS · Python · SQL · Dart',
-        desc: 'Full-stack practice monorepo and web/Python calculators.',
+        title: 'BarberGo, v1, CoreStack & Calc',
+        tag: 'HTML5 · Python · SQL · Dart',
+        desc: 'Barbershop site, SVG v1 portfolio, practice monorepo & calculators.',
         to: '/projects'
       }
     ],
-    action: { label: 'Explore All 12 Projects', to: '/projects' }
+    action: { label: `Explore All ${PROJECT_COUNT} Projects`, to: '/projects' }
+  },
+  {
+    triggers: ['ims', 'inventory', 'acadify', 'lms', 'sheetsentry', 'excel', 'xlsx', 'spreadsheet'],
+    reply:
+      'Earl’s newest systems on GitHub (EARL146) cover enterprise inventory, multi-tenant learning management, and spreadsheet validation:',
+    items: [
+      {
+        num: '01',
+        title: 'IMS Platform',
+        tag: 'Java 21 · Spring Boot 3 · MySQL 8',
+        desc: 'Stock movement ledger, supplier payables, customer commerce & cashier POS.',
+        to: '/projects'
+      },
+      {
+        num: '02',
+        title: 'Acadify LMS',
+        tag: 'React 19 · Spring Boot 3.4 · MySQL 8',
+        desc: 'Six role-isolated portals, whole grade & honors computation, and audit trail.',
+        to: '/projects'
+      },
+      {
+        num: '03',
+        title: 'SheetSentry',
+        tag: 'React · Express · MySQL',
+        desc: 'Pre-ingestion CSV/.xlsx rules engine with formula shield & multi-sheet exports.',
+        to: '/projects'
+      }
+    ],
+    action: { label: 'Spin 3D Project Reel', to: '/lab#cylinder' }
   },
   {
     triggers: ['motofix', 'moto', 'ecommerce', 'motorcycle', 'parts'],
@@ -178,10 +202,17 @@ const KNOWLEDGE_BASE = [
     action: { label: 'Open Projects', to: '/projects' }
   },
   {
-    triggers: ['v1', 'version 1', 'svg', 'evolution', 'lab', 'cylinder', 'v2'],
+    triggers: ['v1', 'version 1', 'svg', 'evolution', 'lab', 'cylinder', 'reel', '3d', 'v2'],
     reply:
-      'You can compare both generations of Earl’s portfolio side by side inside the Dev Lab:',
+      'You can spin the 3D Project Reel or compare both generations of Earl’s portfolio side by side inside the Dev Lab:',
     items: [
+      {
+        num: '3D',
+        title: 'Interactive 3D Project Reel',
+        tag: 'Three.js · WebGL',
+        desc: 'Spin, tilt & click across all 15 shipped GitHub projects in 3D.',
+        to: '/lab#cylinder'
+      },
       {
         num: 'v2',
         title: 'Version 2.0 (Current Flagship)',
@@ -197,7 +228,7 @@ const KNOWLEDGE_BASE = [
         to: '/lab'
       }
     ],
-    action: { label: 'Open Dev Lab', to: '/lab' }
+    action: { label: 'Open 3D Project Reel', to: '/lab#cylinder' }
   },
   {
     triggers: ['cert', 'certificate', 'tesda', 'opswat', 'pycon', 'ghl', 'credential', 'datacamp', 'sql', 'python', 'git'],
@@ -296,7 +327,7 @@ const KNOWLEDGE_BASE = [
 ];
 
 const QUICK_PROMPTS = [
-  { label: 'Shipped projects (12)', query: 'What projects has Earl shipped?' },
+  { label: `Shipped projects (${PROJECT_COUNT})`, query: 'What projects has Earl shipped?' },
   { label: 'Core tech stack', query: 'What is Earl’s core tech stack?' },
   { label: '12 Certificates', query: 'Show his 12 certificates' },
   { label: 'Resume / CV', query: 'Open Resume / CV' },
@@ -357,7 +388,7 @@ export default function ChatBuddy({ onOpenResume }) {
           ...prev,
           {
             sender: 'bot',
-            text: 'Earl builds full-stack web apps, Java Spring Boot & Node.js APIs, MySQL databases and Flutter apps. Want to browse his 12 shipped projects or send a note?',
+            text: `Earl builds full-stack web apps, Java Spring Boot & Node.js APIs, MySQL databases and Flutter apps. Want to browse his ${PROJECT_COUNT} shipped projects or send a note?`,
             action: { label: 'Explore Projects', to: '/projects' },
             meta: 'EarlBot · just now'
           }

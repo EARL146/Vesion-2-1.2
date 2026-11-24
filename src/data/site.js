@@ -114,6 +114,66 @@ export const STACK_ROWS = [
 
 export const PROJECTS = [
   {
+    id: 'ims',
+    title: 'IMS Platform',
+    subtitle: 'Inventory, POS & commerce',
+    category: 'Business System',
+    image: './projects/ims-preview.svg',
+    imageAlt: 'Illustrated preview of the IMS inventory, procurement and POS platform',
+    github: 'https://github.com/EARL146/IMS-System-Flow-and-Architecture-Report',
+    tech: ['Java 21', 'Spring Boot 3', 'React', 'TypeScript', 'MySQL 8'],
+    icons: ['java', siSpringboot, siReact, siTypescript, siMysql],
+    summary:
+      'A full-stack inventory, procurement, POS and customer commerce platform with a Java 21 Spring Boot 3 REST API, a React and TypeScript frontend, MySQL 8, and Flyway migrations.',
+    bullets: [
+      'Immutable stock movement ledger with multi-warehouse transfers and deadlock-safe lock ordering.',
+      'Procurement, supplier returns and payables reconciliation with idempotent payments.',
+      'Customer storefront with delivery or store pickup, plus a cashier POS with returns and refunds.',
+      'Role-based access control, login lockout, audit events and least-privilege database users.'
+    ],
+    layout: 'wide'
+  },
+  {
+    id: 'lms-acadify',
+    title: 'Acadify LMS',
+    subtitle: 'Multi-tenant learning platform',
+    category: 'Business System',
+    image: './projects/lms-acadify-preview.svg',
+    imageAlt: 'Illustrated preview of the Acadify learning management system student portal',
+    github: 'https://github.com/EARL146/LMS-Acadify-Security-and-Architecture-Audit-',
+    tech: ['React 19', 'TypeScript', 'Spring Boot 3.4', 'MySQL 8'],
+    icons: [siReact, siTypescript, siSpringboot, siMysql],
+    summary:
+      'A multi-tenant Learning Management System with six role-isolated portals, built with React 19, TypeScript, Spring Boot 3.4 and MySQL 8.',
+    bullets: [
+      'Portals for super admin, school admin, instructor, student, parent and a public certificate verifier.',
+      'Student answer calendar with past due, to answer and answered statuses.',
+      'Whole grade and academic honors computation, with append-only grade history and security auditing.',
+      'Rate-limited public certificate verification using hashed codes.'
+    ],
+    layout: 'wide'
+  },
+  {
+    id: 'sheetsentry',
+    title: 'SheetSentry',
+    subtitle: 'Spreadsheet validation SaaS',
+    category: 'Full-Stack Web',
+    image: './projects/sheetsentry-preview.svg',
+    imageAlt: 'Illustrated preview of the SheetSentry spreadsheet validation report',
+    github: 'https://github.com/EARL146/Sheetsentry',
+    tech: ['React', 'TypeScript', 'Express', 'MySQL'],
+    icons: [siReact, siTypescript, siExpress, siMysql],
+    summary:
+      'A React, TypeScript, Express and MySQL platform that validates CSV and .xlsx files against reusable rules before ingestion.',
+    bullets: [
+      'Row- and cell-level validation with reusable rule profiles.',
+      'Formula injection shield that neutralizes dangerous spreadsheet prefixes.',
+      'Exports a styled multi-sheet Excel workbook plus clean and remediation CSVs.',
+      'Separate phone and desktop interfaces with an admin console.'
+    ],
+    layout: 'wide'
+  },
+  {
     id: 'motofix',
     title: 'MotoFix',
     subtitle: 'Motorcycle parts e-commerce',

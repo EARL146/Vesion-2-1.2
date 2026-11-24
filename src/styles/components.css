@@ -1436,6 +1436,11 @@
 }
 
 @media (min-width: 1100px) {
+  .pgrid-bento.pgrid-bento--systems {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto;
+  }
+
   .pgrid-bento.pgrid-bento--more {
     grid-template-columns: 1.45fr 0.8fr 0.8fr;
     grid-template-rows: auto auto;
@@ -2433,81 +2438,246 @@
   font-weight: 600;
 }
 
-/* Interactive 3D Cylinder Reel */
+/* Interactive 3D Project Reel (Three.js multi-tier barrel) */
 .lab-cylinder {
-  align-items: center;
-  justify-content: space-between;
-  min-height: 410px;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 16px;
+  min-height: 0;
 }
 
-.cylinder-stage {
-  width: 100%;
-  height: 290px;
-  perspective: 1100px;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-
-.cylinder-ring {
+.reel3d {
   position: relative;
-  width: 260px;
-  height: 230px;
-  transform-style: preserve-3d;
+  width: 100%;
+  height: 440px;
+  border-radius: 22px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 46%, rgba(var(--accent-rgb), 0.16), transparent 62%),
+    linear-gradient(180deg, rgba(var(--accent-rgb), 0.05), transparent 70%),
+    var(--tint);
+  box-shadow: inset 0 0 0 1px var(--line);
+  outline: none;
 }
 
-.cylinder-card {
+.reel3d:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.reel3d--loading {
+  animation: reel3d-pulse 1.4s ease-in-out infinite;
+}
+
+.reel3d__mount,
+.reel3d__canvas {
   position: absolute;
   inset: 0;
-  border-radius: 18px;
-  overflow: hidden;
-  background: var(--paper);
-  box-shadow: inset 0 0 0 1px var(--line-strong), 0 22px 42px -20px rgba(6, 12, 26, 0.55);
-  display: flex;
-  flex-direction: column;
-  transform:
-    translateX(calc(var(--slot) * 165px))
-    translateZ(calc(var(--slot) * var(--slot) * -45px))
-    rotateY(calc(var(--slot) * -18deg))
-    scale(calc(1 - (var(--slot) * var(--slot) * 0.06)));
-  transition: transform 0.45s var(--ease-out), opacity 0.35s var(--ease-out);
-}
-
-.cylinder-card:not(.is-center) {
-  opacity: 0.72;
-}
-
-.cylinder-card__img {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-  background: var(--cream);
-}
-
-.cylinder-card__img img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  display: block;
 }
 
-.cylinder-card__foot {
-  padding: 10px 12px;
+.reel3d__canvas {
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.reel3d__canvas.is-grabbing {
+  cursor: grabbing;
+}
+
+.reel3d__badge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 7px 12px 8px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 14px 28px -12px rgba(var(--accent-rgb), 0.6);
+  pointer-events: none;
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.18s ease;
+}
+
+.reel3d__badge.is-on {
+  opacity: 1;
+}
+
+.reel3d__badge small {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.reel3d__badge strong {
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.reel3d-stage-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.reel3d__expand {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  color: var(--navy);
+  font-size: 11.5px;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--line-strong), 0 8px 20px -12px rgba(6, 12, 26, 0.45);
+  transition: transform var(--dur-fast) var(--ease-spring), color var(--dur-fast) ease;
+}
+
+.reel3d__expand:hover {
+  transform: translateY(-1px);
+  color: var(--accent-ink);
+}
+
+.reel3d__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1px var(--line);
+  white-space: nowrap;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.pmodal--theater {
+  background: rgba(6, 11, 22, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.reel3d-theater {
+  position: relative;
+  width: min(1240px, 94vw);
+  height: min(86dvh, 760px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.reel3d.is-expanded {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(44, 132, 221, 0.22), transparent 62%),
+    rgba(9, 16, 30, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 28px 60px -20px rgba(0, 0, 0, 0.65);
+}
+
+.reel3d.is-expanded .reel3d__hint {
+  background: rgba(11, 22, 42, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  color: rgba(222, 234, 252, 0.82);
+}
+
+.reel3d-theater__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 6;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(11, 22, 42, 0.78);
+  color: #FFFFFF;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  transition: transform var(--dur-fast) var(--ease-spring), background-color var(--dur-fast) ease;
+}
+
+.reel3d-theater__close:hover {
+  transform: scale(1.06);
+  background: var(--accent);
+}
+
+.reel3d-theater__bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border-top: 1px solid var(--line);
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line-strong), 0 16px 32px -18px rgba(0, 0, 0, 0.55);
 }
 
-.cylinder-card__foot strong {
+.reel3d--fallback {
+  height: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 14px;
+  overflow: visible;
+}
+
+.reel3d__fallback-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  padding: 8px;
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+.reel3d__fallback-card img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 9px;
+}
+
+.reel3d__fallback-card strong {
   font-size: 13px;
   color: var(--navy);
 }
 
-.cylinder-card__foot span {
+.reel3d__fallback-card span {
   font-size: 11px;
   color: var(--accent-ink);
   font-weight: 600;
+}
+
+@keyframes reel3d-pulse {
+  50% {
+    opacity: 0.6;
+  }
 }
 
 .cylinder-controls {

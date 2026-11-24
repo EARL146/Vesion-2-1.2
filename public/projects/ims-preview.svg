@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="t d">
+  <title id="t">IMS inventory, procurement and POS platform preview</title>
+  <desc id="d">Illustrated dashboard concept showing a stock ledger, warehouses, purchase orders and a POS panel.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0b1e3f"/><stop offset="1" stop-color="#16407a"/></linearGradient>
+    <linearGradient id="ac" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2c84dd"/><stop offset="1" stop-color="#60a5fa"/></linearGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#06101f" flood-opacity=".25"/></filter>
+  </defs>
+  <rect width="1200" height="760" rx="32" fill="url(#bg)"/>
+  <rect x="28" y="28" width="1144" height="704" rx="24" fill="#f4f7fb"/>
+  <rect x="28" y="28" width="230" height="704" rx="24" fill="#0f2447"/>
+  <path d="M234 28h24v704h-24z" fill="#0f2447"/>
+  <rect x="54" y="58" width="46" height="46" rx="14" fill="url(#ac)"/>
+  <path d="M68 90V72l9-5 9 5v18l-9 5z M68 72l9 5 9-5 M77 77v18" stroke="#fff" stroke-width="3" fill="none" stroke-linejoin="round"/>
+  <text x="114" y="88" fill="#fff" font-family="Arial,sans-serif" font-size="24" font-weight="700">IMS</text>
+  <text x="58" y="152" fill="#7f95b8" font-family="Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="2">OPERATIONS</text>
+  <rect x="44" y="172" width="190" height="50" rx="13" fill="#1f3b69"/>
+  <circle cx="70" cy="197" r="7" fill="#60a5fa"/>
+  <text x="92" y="203" fill="#fff" font-family="Arial,sans-serif" font-size="16" font-weight="600">Overview</text>
+  <g font-family="Arial,sans-serif" font-size="16" fill="#a9bad6">
+    <text x="92" y="259">Inventory ledger</text><text x="92" y="305">Warehouses</text><text x="92" y="351">Purchasing</text>
+    <text x="92" y="397">POS &amp; returns</text><text x="92" y="443">Suppliers</text><text x="92" y="489">Audit events</text>
+  </g>
+  <text x="292" y="92" fill="#0b1e3f" font-family="Arial,sans-serif" font-size="28" font-weight="700">Operations overview</text>
+  <text x="292" y="122" fill="#6b7a93" font-family="Arial,sans-serif" font-size="15">Ledger vs. balance reconciliation · multi-warehouse</text>
+  <rect x="940" y="66" width="190" height="48" rx="13" fill="url(#ac)"/>
+  <text x="968" y="96" fill="#fff" font-family="Arial,sans-serif" font-size="15" font-weight="700">+ Stock transfer</text>
+  <g filter="url(#sh)">
+    <rect x="292" y="156" width="256" height="128" rx="18" fill="#fff"/>
+    <rect x="566" y="156" width="256" height="128" rx="18" fill="#fff"/>
+    <rect x="840" y="156" width="290" height="128" rx="18" fill="#fff"/>
+  </g>
+  <g font-family="Arial,sans-serif">
+    <text x="316" y="194" fill="#6b7a93" font-size="14">STOCK ON HAND</text><text x="316" y="246" fill="#0b1e3f" font-size="38" font-weight="700">2,481</text>
+    <text x="590" y="194" fill="#6b7a93" font-size="14">OPEN PURCHASE ORDERS</text><text x="590" y="246" fill="#0b1e3f" font-size="38" font-weight="700">14</text>
+    <text x="864" y="194" fill="#6b7a93" font-size="14">POS SALES TODAY</text><text x="864" y="246" fill="#0b1e3f" font-size="38" font-weight="700">₱46,980</text>
+  </g>
+  <g filter="url(#sh)">
+    <rect x="292" y="312" width="540" height="392" rx="20" fill="#fff"/>
+    <rect x="852" y="312" width="278" height="392" rx="20" fill="#fff"/>
+  </g>
+  <text x="318" y="352" fill="#0b1e3f" font-family="Arial,sans-serif" font-size="18" font-weight="700">Stock movement ledger</text>
+  <g font-family="Arial,sans-serif" font-size="13" fill="#6b7a93"><text x="318" y="392">TYPE</text><text x="478" y="392">ITEM</text><text x="650" y="392">QTY</text><text x="730" y="392">WAREHOUSE</text></g>
+  <path d="M318 404h488" stroke="#e3e9f2"/>
+  <g font-family="Arial,sans-serif" font-size="14" fill="#1b2b4a">
+    <rect x="318" y="422" width="108" height="26" rx="13" fill="#e3f1ff"/><text x="334" y="440" fill="#1f5fa8" font-weight="700">TRANSFER_OUT</text>
+    <text x="478" y="440">Steel brackets</text><text x="650" y="440">-120</text><text x="730" y="440">WH-A</text>
+    <rect x="318" y="472" width="108" height="26" rx="13" fill="#e2f6ec"/><text x="336" y="490" fill="#1f7a51" font-weight="700">TRANSFER_IN</text>
+    <text x="478" y="490">Steel brackets</text><text x="650" y="490">+120</text><text x="730" y="490">WH-B</text>
+    <rect x="318" y="522" width="108" height="26" rx="13" fill="#fff0d9"/><text x="342" y="540" fill="#a8661a" font-weight="700">PO_RECEIPT</text>
+    <text x="478" y="540">Battery packs</text><text x="650" y="540">+300</text><text x="730" y="540">WH-A</text>
+    <rect x="318" y="572" width="108" height="26" rx="13" fill="#fde7e7"/><text x="346" y="590" fill="#b3363a" font-weight="700">POS_SALE</text>
+    <text x="478" y="590">Cable ties</text><text x="650" y="590">-18</text><text x="730" y="590">Store</text>
+    <rect x="318" y="622" width="108" height="26" rx="13" fill="#e3f1ff"/><text x="338" y="640" fill="#1f5fa8" font-weight="700">ADJUSTMENT</text>
+    <text x="478" y="640">LED panels</text><text x="650" y="640">-2</text><text x="730" y="640">WH-B</text>
+  </g>
+  <text x="878" y="352" fill="#0b1e3f" font-family="Arial,sans-serif" font-size="18" font-weight="700">Security &amp; roles</text>
+  <g font-family="Arial,sans-serif" font-size="14" fill="#1b2b4a">
+    <rect x="878" y="378" width="226" height="40" rx="12" fill="#eef4fb"/><text x="896" y="403">RBAC · 9 roles</text>
+    <rect x="878" y="430" width="226" height="40" rx="12" fill="#eef4fb"/><text x="896" y="455">Idempotent writes</text>
+    <rect x="878" y="482" width="226" height="40" rx="12" fill="#eef4fb"/><text x="896" y="507">Pessimistic row locks</text>
+    <rect x="878" y="534" width="226" height="40" rx="12" fill="#eef4fb"/><text x="896" y="559">Login lockout &amp; audit</text>
+    <rect x="878" y="602" width="226" height="64" rx="14" fill="url(#ac)"/>
+    <text x="896" y="629" fill="#fff" font-weight="700">Java 21 · Spring Boot 3</text>
+    <text x="896" y="652" fill="#dbeafe" font-size="13">React · TypeScript · MySQL 8</text>
+  </g>
+</svg>

@@ -103,17 +103,21 @@ export function RouterProvider({ children }) {
   const [path, setPath] = useState(getInitialRoute);
 
   const navigate = useCallback((to, options = {}) => {
-    const next = normalizeRoute(to);
+    const raw = String(to || '/');
+    const hashIdx = raw.indexOf('#');
+    const hash = hashIdx >= 0 ? raw.slice(hashIdx) : '';
+    const next = normalizeRoute(raw);
     setPath((prev) => {
-      if (prev === next && !options.force) return prev;
+      if (prev === next && !hash && !options.force) return prev;
       if (typeof window !== 'undefined') {
         document.documentElement.classList.add('has-navigated');
-        const fullUrl = `${BASE_PATH}${next === '/' ? '/' : next}`;
+        const fullUrl = `${BASE_PATH}${next === '/' ? '/' : next}${hash}`;
         if (options.replace) {
           window.history.replaceState(null, '', fullUrl);
         } else {
           window.history.pushState(null, '', fullUrl);
         }
+        window.dispatchEvent(new CustomEvent('route-hash-change', { detail: { path: next, hash } }));
       }
       return next;
     });

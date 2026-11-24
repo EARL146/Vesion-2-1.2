@@ -14,7 +14,9 @@ import {
   siJavascript,
   siCss,
   siPython,
-  siDocker
+  siDocker,
+  siTypescript,
+  siExpress
 } from 'simple-icons';
 import { useRouter } from '../lib/router';
 import { ArrowUpRightIcon, BrandIcon } from '../components/Icons';
@@ -213,7 +215,7 @@ export default function ProjectsPage({ onOpenProject }) {
             type="button"
             className="bento-card pcard pcard--gens"
             data-cat="lab"
-            onClick={() => navigate('/lab')}
+            onClick={() => navigate('/lab#cylinder')}
           >
             <div className="bento__logos">
               <span className="bento__logo"><BrandIcon item={siReact} size={19} /></span>
@@ -265,10 +267,75 @@ export default function ProjectsPage({ onOpenProject }) {
 
         {/* ---------- Second screen: business systems & code archive ---------- */}
         <div className="pgrid-more" data-filter={filter}>
-          <div className="pgrid-more__head" data-cat="web systems lab">
+          <div className="pgrid-more__head" data-cat="web systems java lab">
             <span className="pgrid-more__eyebrow">BUSINESS SYSTEMS &amp; CODE ARCHIVE</span>
             <span className="pgrid-more__rule" aria-hidden="true" />
-            <span className="pgrid-more__count">5 more on GitHub</span>
+            <span className="pgrid-more__count">8 more on GitHub</span>
+          </div>
+
+          <div className="pgrid-bento pgrid-bento--systems" data-filter={filter}>
+            {/* IMS Platform */}
+            <button
+              type="button"
+              className="bento-card pcard pcard--shot"
+              data-cat="web systems java"
+              onClick={() => onOpenProject('ims')}
+            >
+              <div className="bento__logos">
+                <span className="bento__logo"><BrandIcon item="java" size={19} /></span>
+                <span className="bento__logo"><BrandIcon item={siSpringboot} size={19} /></span>
+                <span className="bento__logo"><BrandIcon item={siReact} size={19} /></span>
+                <span className="bento__logo"><BrandIcon item={siMysql} size={19} /></span>
+              </div>
+              <h3 className="bento-card__title">IMS Platform</h3>
+              <p className="bento-card__desc">Inventory ledger, multi-warehouse transfers, POS &amp; procurement.</p>
+              <div className="bento-win pcard__shot-win">
+                <div className="bento-win__bar"><i /><i /><i /></div>
+                <img src="./projects/ims-preview.svg" alt="IMS inventory, procurement and POS platform preview" />
+              </div>
+            </button>
+
+            {/* Acadify LMS */}
+            <button
+              type="button"
+              className="bento-card pcard pcard--shot"
+              data-cat="web systems java"
+              onClick={() => onOpenProject('lms-acadify')}
+            >
+              <div className="bento__logos">
+                <span className="bento__logo"><BrandIcon item={siReact} size={19} /></span>
+                <span className="bento__logo"><BrandIcon item={siTypescript} size={19} /></span>
+                <span className="bento__logo"><BrandIcon item={siSpringboot} size={19} /></span>
+                <span className="bento__logo"><BrandIcon item={siMysql} size={19} /></span>
+              </div>
+              <h3 className="bento-card__title">Acadify LMS</h3>
+              <p className="bento-card__desc">Multi-tenant LMS with 6 role portals, answer calendar &amp; cert verifier.</p>
+              <div className="bento-win pcard__shot-win">
+                <div className="bento-win__bar"><i /><i /><i /></div>
+                <img src="./projects/lms-acadify-preview.svg" alt="Acadify multi-tenant learning management system preview" />
+              </div>
+            </button>
+
+            {/* SheetSentry */}
+            <button
+              type="button"
+              className="bento-card pcard pcard--shot"
+              data-cat="web systems"
+              onClick={() => onOpenProject('sheetsentry')}
+            >
+              <div className="bento__logos">
+                <span className="bento__logo"><BrandIcon item={siReact} size={19} /></span>
+                <span className="bento__logo"><BrandIcon item={siTypescript} size={19} /></span>
+                <span className="bento__logo"><BrandIcon item={siExpress} size={19} /></span>
+                <span className="bento__logo"><BrandIcon item={siMysql} size={19} /></span>
+              </div>
+              <h3 className="bento-card__title">SheetSentry</h3>
+              <p className="bento-card__desc">CSV &amp; Excel validator, formula shield &amp; clean multi-sheet exports.</p>
+              <div className="bento-win pcard__shot-win">
+                <div className="bento-win__bar"><i /><i /><i /></div>
+                <img src="./projects/sheetsentry-preview.svg" alt="SheetSentry spreadsheet validation SaaS preview" />
+              </div>
+            </button>
           </div>
 
           <div className="pgrid-bento pgrid-bento--more" data-filter={filter}>
